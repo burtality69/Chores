@@ -1,0 +1,9 @@
+{
+	"compilerOptions": {
+		"module" : "amd",
+		"target" : "ES5"
+	},
+	"files": [
+		"./Main.ts"
+	]
+}
