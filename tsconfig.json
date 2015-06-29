@@ -1,9 +1,10 @@
 {
 	"compilerOptions": {
 		"module" : "amd",
-		"target" : "ES5"
+		"target" : "ES5",
+		"out" : "./Code/Main.js"
 	},
 	"files": [
-		"./Main.ts"
+		"./Code/Main.ts"
 	]
 }

@@ -2,19 +2,26 @@
 <html>
 	<head>
 		<script src="./Dependencies/firebase.js"></script>
-		<script src="./Main.js"></script>
+		<script src="./Dependencies/angular.min.js"></script>
+		<script src="./Code/Main.js"></script>
+		<link rel="stylesheet" type="text/css" href="./styles/site.css">
+		<link rel="stylesheet" type="text/css" href="./styles/font-awesome.min.css">
 	</head>
 	<body>
-	
-		<table id="chorelist">
-			<tr id="newChore">
-				<td><input type="text"></input></td>
-				<td><input type="text"></input></td>
-				<td><input type="text"></input></td>
-			</tr>
-		</table>
 		
+		<div id="chorelistcontainer">
+			<ul id="chorelist"></ul>
+		</div>
+		
+		<div> Create a new chore
+			<form id="newChoreForm">
+				<input id="newChorename" name="name" placeholder="Chore name" type="text"></input>
+				<input id="newChoredescription" name="desc" placeholder="Chore Description" type="text"></input>
+				<input id="newChorefrequency" name="freq" placeholder="Chore Frequency" type="text"></input>
+				<button type="submit" id="addChore" >Add</button>
+			</form>
+		</div>
 	</body>
-	<footer>
-		</footer>
+	<footer></footer>
+
 </html>
