@@ -4,100 +4,80 @@
 ///<reference path="../all.d.ts"/>
 ///<reference path="../all.d.ts"/>
 ;
-///<reference path="../typings/firebase.d.ts"/>
-var firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
-var choresUrl = firebase.child("Chores");
-var weekly = firebase.child("weekly");
 ///<reference path="../all.d.ts"/>
-/** returns the chorelist for a given week */
-function getList() {
-    var d = new Date();
-    var day = d.getDay();
-    var diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
-    var weekstart = new Date(d.setDate(diff)).toLocaleDateString();
-    var t = {};
-    var exists = false;
-    //Short circuit here if value is found
-    weekly.child(weekstart).once("value", function (data) {
-        exists = (data.val() !== null);
-        if (exists)
-            return data.val();
-    });
-    return createWeek(weekstart);
-}
-/**If the week in question doesn't already exist, create it and return it */
-function createWeek(ID) {
-    var t = {};
-    var weeklyChores = {};
-    choresUrl.once("value", function parseChores(data) {
-        t = data.val();
-    });
-    for (var p in t) {
-        var c = t[p];
-        c.approved = false;
-        c.completed = false;
-        weeklyChores[p] = c;
-    }
-    weekly.child(ID).set(weeklyChores);
-    return weeklyChores;
-}
-///<reference path="../all.d.ts"/>
-var ChoreKeys = ["Name", "Description", "Frequency"];
-var firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
-var choresUrl = firebase.child("Chores");
-var date = new Date();
-var Chores = {};
-function choreTable(c, target) {
-    var container = document.querySelector("#chorelistcontainer");
-    var list = document.querySelector("#chorelist");
-    while (list.firstChild) {
-        list.removeChild(list.firstChild);
-    }
-    var headerrow = document.createElement("li");
-    headerrow.innerHTML = "Chores";
-    headerrow.classList.add("listheader");
-    list.appendChild(headerrow);
-    Object.keys(c).forEach(function (row) {
-        var li = document.createElement("li");
-        var thisrow = c[row];
-        ChoreKeys.map(function (p) {
-            var d = document.createElement("div");
-            d.innerText = thisrow[p];
-            if (p == "Name") {
-                d.classList.add("lititle");
+var Chores;
+(function (Chores) {
+    var app = angular.module('Chores', [])
+        .service('firebaseSvc', Chores.Services.fireBaseSvc)
+        .controller(Chores.Controllers)
+        .directive(Chores.Directives);
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Directives;
+    (function (Directives) {
+        function chorelist() {
+            return {
+                templateUrl: './Templates/Chorelist.html'
+            };
+        }
+        Directives.chorelist = chorelist;
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var chorelistController = (function () {
+            function chorelistController() {
             }
-            li.appendChild(d);
-        });
-        var controls = document.createElement("div");
-        var del = document.createElement("i");
-        var edit = document.createElement("i");
-        del.classList.add("fa");
-        del.classList.add("fa-times");
-        edit.classList.add("fa-pencil-square-o");
-        controls.appendChild(del);
-        controls.appendChild(edit);
-        controls.classList.add("chorecontrols");
-        li.appendChild(controls);
-        list.appendChild(li);
-    });
-}
-function run() {
-    choresUrl.on("value", function (snapshot) {
-        Chores = snapshot.val();
-        choreTable(Chores);
-    }, function (errorObject) {
-        console.log("The read failed: " + errorObject.code);
-    });
-    var newChoreForm = document.querySelector("#newChoreForm");
-    newChoreForm.addEventListener("submit", function () {
-        var f = newChoreForm;
-        var c = {
-            Description: f.elements["desc"].value,
-            Frequency: f.elements["freq"].value,
-            Name: f.elements["name"].value
-        };
-        choresUrl.child(f.elements["name"].value).set(c);
-    });
-    getList();
-}
-document.addEventListener('DOMContentLoaded', run, false);
+            return chorelistController;
+        })();
+        Controllers.chorelistController = chorelistController;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Directives;
+    (function (Directives) {
+        function Chore() {
+            return {
+                templateURL: '',
+                controller: Chores.Controllers.ChoreController,
+                scope: { Chore: '=' }
+            };
+        }
+        Directives.Chore = Chore;
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var ChoreController = (function () {
+            function ChoreController(firebaseSvc) {
+            }
+            ChoreController.$inject = ['firebaseSvc'];
+            return ChoreController;
+        })();
+        Controllers.ChoreController = ChoreController;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Services;
+    (function (Services) {
+        var fireBaseSvc = (function () {
+            function fireBaseSvc() {
+                this.firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
+                this.choresUrl = this.firebase.child("Chores");
+                this.weekly = this.firebase.child("weekly");
+            }
+            return fireBaseSvc;
+        })();
+        Services.fireBaseSvc = fireBaseSvc;
+    })(Services = Chores.Services || (Chores.Services = {}));
+})(Chores || (Chores = {}));

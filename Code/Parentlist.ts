@@ -1,1 +1,0 @@
-///<reference path="../typings/firebase.d.ts"/>

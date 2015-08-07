@@ -9,6 +9,7 @@ var date: Date = new Date();
 var Chores: ChoreList = {}; 
 
 function choreTable(c: ChoreList, target?: HTMLElement): void {
+	
 	var container: HTMLTableElement = <HTMLTableElement> document.querySelector("#chorelistcontainer");
 	var list: HTMLUListElement = <HTMLUListElement> document.querySelector("#chorelist"); 
 	while (list.firstChild) {

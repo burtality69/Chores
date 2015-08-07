@@ -3,22 +3,18 @@
 	<head>
 		<script src="./Dependencies/firebase.js"></script>
 		<script src="./Dependencies/angular.min.js"></script>
-		<script src="./Code/Main.js"></script>
-		<link rel="stylesheet" type="text/css" href="./styles/site.css">
-		<link rel="stylesheet" type="text/css" href="./styles/font-awesome.min.css">
+		<script src="./Release/app.js"></script>
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
 	</head>
-	<body>
+	<body ng-app="Chores">
+		<chore-list></chore-list>
 		
-		<div id="chorelistcontainer">
-			<ul id="chorelist"></ul>
-		</div>
-		
-		<div> Create a new chore
+		<div>Create a new chore
 			<form id="newChoreForm">
 				<input id="newChorename" name="name" placeholder="Chore name" type="text"></input>
 				<input id="newChoredescription" name="desc" placeholder="Chore Description" type="text"></input>
 				<input id="newChorefrequency" name="freq" placeholder="Chore Frequency" type="text"></input>
-				<button type="submit" id="addChore" >Add</button>
+				<button type="submit" id="addChore">Add</button>
 			</form>
 		</div>
 	</body>
