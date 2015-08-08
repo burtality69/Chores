@@ -1,4 +1,3 @@
-///<reference path="../all.d.ts"/>
 
 var ChoreKeys: Array<string> = ["Name","Description","Frequency"]; 
 

@@ -9,7 +9,7 @@ function getList(): ChoreTemplateList {
 	var exists: boolean = false; 
 	
 	//Short circuit here if value is found
-	weekly.child(weekstart).once("value",function(data){
+	weekly.child(weekstart).once("value",function(data: FirebaseDataSnapshot){
 		exists = (data.val() !== null)
 		if(exists) return data.val();
 	})

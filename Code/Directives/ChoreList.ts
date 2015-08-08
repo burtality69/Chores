@@ -21,9 +21,7 @@ module Chores.Controllers {
 		
 		constructor(firebaseSvc: Chores.Services.fireBaseSvc) {
 			firebaseSvc.getChoreList();
-			this.chorelist = [
-				{Description: 'Butt', Frequency: 'Weekly', Name: 'Poop', completed: false, approved: false}
-				]	
+			this.chorelist = firebaseSvc.getChoreList();
 		}
 		
 		static $inject = ['firebaseSvc'];

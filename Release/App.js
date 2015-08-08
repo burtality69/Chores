@@ -16,12 +16,16 @@ var Chores;
                 this.weekly = this.firebase.child("weekly");
             }
             fireBaseSvc.prototype.getChoreList = function () {
+                var ret = [];
                 this.choresUrl.on("value", function (snapshot) {
                     var Chores = snapshot.val();
-                    console.log('got some sweet chores');
+                    Object.keys(Chores).forEach(function (a) {
+                        ret.push(Chores[a]);
+                    });
                 }, function (errorObject) {
                     console.log("The read failed: " + errorObject.code);
                 });
+                return ret;
             };
             return fireBaseSvc;
         })();
@@ -53,9 +57,7 @@ var Chores;
         var chorelistController = (function () {
             function chorelistController(firebaseSvc) {
                 firebaseSvc.getChoreList();
-                this.chorelist = [
-                    { Description: 'Butt', Frequency: 'Weekly', Name: 'Poop', completed: false, approved: false }
-                ];
+                this.chorelist = firebaseSvc.getChoreList();
             }
             chorelistController.$inject = ['firebaseSvc'];
             return chorelistController;
@@ -68,19 +70,26 @@ var Chores;
 (function (Chores) {
     var Directives;
     (function (Directives) {
-        function chore() {
+        function choreCard() {
             return {
                 restrict: 'EA',
                 require: '^choreList',
-                templateURL: './Templates/Chore.html',
+                //templateURL: './Templates/Chore.html',
                 controller: Chores.Controllers.ChoreController,
                 controllerAs: 'ChoreCtrl',
                 bindToController: true,
                 scope: { chore: '=' },
                 replace: true,
+                template: '<div class="card avatar">' +
+                    '<img src="images/yuna.jpg" alt="" class="circle">' +
+                    '<span class="title">Title</span>' +
+                    '<p>{{ChoreCtrl.chore.name}}</p>' +
+                    '<i class="material-icons dp48 secondary-content">done</i>' +
+                    '</div>'
             };
         }
-        Directives.chore = chore;
+        Directives.choreCard = choreCard;
+        ;
     })(Directives = Chores.Directives || (Chores.Directives = {}));
 })(Chores || (Chores = {}));
 var Chores;
@@ -89,6 +98,7 @@ var Chores;
     (function (Controllers) {
         var ChoreController = (function () {
             function ChoreController() {
+                console.log('Constructed a chore');
             }
             ChoreController.$inject = ['firebaseSvc'];
             return ChoreController;

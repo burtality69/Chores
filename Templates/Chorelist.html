@@ -1,6 +1,6 @@
 <div>
-	<h2> This is a chorelist </h2>
-	<ul id="choreList">
-		<li chore ng-repeat="chore in ChoreListCtrl.chorelist"></li>
-	</ul>
+	<h1 class="header center orange-text"> This is a chorelist </h1>
+	<div class="container" id="choreList">
+		<chore-card ng-repeat="chore in ChoreListCtrl.chorelist"></chore-card>
+	</div>
 </div>

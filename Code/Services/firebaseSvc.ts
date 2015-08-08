@@ -1,6 +1,6 @@
 ///<reference path="../../all.d.ts"/>
 
-namespace Chores.Services {
+module Chores.Services {
 	
 	export class fireBaseSvc {
 		public firebase: Firebase
@@ -14,12 +14,18 @@ namespace Chores.Services {
 		}
 		
 		getChoreList(){
-			this.choresUrl.on("value", function(snapshot: FirebaseDataSnapshot) {
+			var ret: Chore[] = [];
+			this.choresUrl.on("value", (snapshot: FirebaseDataSnapshot)=> {
 				var Chores = snapshot.val();
-				console.log('got some sweet chores')
-			}, (errorObject) => {
+				Object.keys(Chores).forEach(a=>{
+					ret.push(Chores[a]);
+				})
+			}, 
+			(errorObject) => {
 				console.log("The read failed: " + errorObject.code);
 			});
+			
+			return ret;
 		}
 	}
 }
