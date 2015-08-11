@@ -1,7 +1,10 @@
 ///<reference path="../../all.d.ts"/>
 
 module Chores.Directives {
-
+	
+	interface IChoreControllerScope extends ng.IScope {
+		ChoreCtrl: Chores.Controllers.ChoreController;
+	}
 	export function choreCard(): ng.IDirective {
 		return {
 			restrict: 'EA',
@@ -10,14 +13,22 @@ module Chores.Directives {
 			controller: Chores.Controllers.ChoreController,
 			controllerAs: 'ChoreCtrl',
 			bindToController: true,
-			scope: { chore: '=' },
+			scope: {chore: '='},
 			replace: true,
-			template: '<div class="card avatar">' + 
-      					'<img src="images/yuna.jpg" alt="" class="circle">' +
-      					'<span class="title">Title</span>' +
-      					'<p>{{ChoreCtrl.chore.name}}</p>' +
-            			'<i class="material-icons dp48 secondary-content">done</i>' +
-	  					'</div>'
+			template: 	'<div ng-swipe-right="ChoreCtrl.complete()" class="card avatar lime accent-3">' + 
+							'<div class="card-content">' +
+		      					'<img class="circle" ng-src="{{ChoreCtrl.imgSource}}"></img>' +
+		      					'<span class="card-title">{{ChoreCtrl.chore.Name}}</span>' +
+		      					'<p>{{ChoreCtrl.chore.Description}}</p>' +
+							'</div>' +
+	  					'</div>',
+		    link: (scope: IChoreControllerScope, el:Element, attr: ng.IAugmentedJQuery,ctrl: Chores.Controllers.chorelistController) =>{
+				scope.ChoreCtrl.complete = ()=> {
+					
+					scope.ChoreCtrl.chore.completed = true;
+					ctrl.chorelist.$save(scope.ChoreCtrl.chore);
+				}
+			}
 		}
 	};
 
@@ -27,9 +38,11 @@ module Chores.Controllers {
 	export class ChoreController {
 		public chore: Chore;
 		public firebaseSvc: Chores.Services.fireBaseSvc;
+		public complete: ()=>void;
+		public imgSource: string;
 
 		constructor() {
-				console.log('Constructed a chore')
+			this.imgSource = './Images/' + this.chore.Image + '.png'
 		}
 
 		static $inject = ['firebaseSvc'];

@@ -3,17 +3,33 @@
 	<head>
 		<script src="./Dependencies/firebase.js"></script>
 		<script src="./Dependencies/angular.min.js"></script>
+		<script src="./Dependencies/angular-animate.min.js"></script>
+		<script src="./Dependencies/angular-touch.min.js"></script>
+		<script src="./Dependencies/angularfire.min.js"></script>
+		<script src="./Dependencies/angular-route.min.js"></script>
 		<script src="./Release/app.js"></script>
-		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
-	</head>
-	<body ng-app="Chores">
 		
-		<section id="main">
-			<div class="container">
-				<chore-list></chore-list>
-			</div>
+		<link rel="stylesheet" type="text/css" href="./Styles/Site.css">
+		<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+		<base href="/">
+	</head>
+	
+	<nav>
+	    <div class="nav-wrapper">
+	      <a href="#" class="brand-logo">Logo</a>
+	      <ul id="nav-mobile" class="right hide-on-med-and-down">
+	        <li><a href="Approve">Approve</a></li>
+	        <li><a href="#History">History</a></li>
+	      </ul>
+	    </div>
+  	</nav>
+	
+	<body ng-app="Chores">
+		<section ng-view id="main">
+			
 		</section>
 	</body>
+	
 	<footer></footer>
 
 </html>
