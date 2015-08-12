@@ -15,19 +15,21 @@ module Chores.Directives {
 
 module Chores.Controllers {
 	export class ApprovalListController {
-		public chorelist: $syncChoreList
+		public chorelist: ChoreList
 		static $inject = ['firebaseSvc','$firebaseArray'];
 		public firebaseArray: AngularFireArrayService;
+		public firebaseSvc: Chores.Services.fireBaseSvc;
 		
-		constructor(firebaseSvc: Chores.Services.fireBaseSvc, $firebaseArray: AngularFireArrayService){
-			
-			firebaseSvc.getChoresOverView().then((p)=>{
+		constructor(firebaseSvc: Chores.Services.fireBaseSvc){
+			this.firebaseSvc = firebaseSvc;
+			this.firebaseSvc.getChoresOverView().then((p)=>{
 				this.chorelist = p;
 			})
 		}
 		
 		approve(){
-			
+			this.firebaseSvc.thisweeksChores.child('Meta').child('Completed').set(true);
+			this.firebaseSvc.thisweeksChores.child('Meta').child('CompletedOn').set(new Date());
 		}		
 	}
 }

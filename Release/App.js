@@ -99,8 +99,9 @@ var Chores;
                 var _this = this;
                 var p = this.$q.defer();
                 this.checkWeek().then(function () {
-                    var t = _this.firebaseArray(_this.thisweeksChores);
-                    p.resolve(t);
+                    _this.thisweeksChores.once('value', function (d) {
+                        p.resolve(d.val());
+                    });
                 });
                 return p.promise;
             };
@@ -135,13 +136,16 @@ var Chores;
     var Controllers;
     (function (Controllers) {
         var ApprovalListController = (function () {
-            function ApprovalListController(firebaseSvc, $firebaseArray) {
+            function ApprovalListController(firebaseSvc) {
                 var _this = this;
-                firebaseSvc.getChoresOverView().then(function (p) {
+                this.firebaseSvc = firebaseSvc;
+                this.firebaseSvc.getChoresOverView().then(function (p) {
                     _this.chorelist = p;
                 });
             }
             ApprovalListController.prototype.approve = function () {
+                this.firebaseSvc.thisweeksChores.child('Meta').child('Completed').set(true);
+                this.firebaseSvc.thisweeksChores.child('Meta').child('CompletedOn').set(new Date());
             };
             ApprovalListController.$inject = ['firebaseSvc', '$firebaseArray'];
             return ApprovalListController;

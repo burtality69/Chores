@@ -78,12 +78,13 @@ module Chores.Services {
 			return p.promise;
 		}
 		
-		getChoresOverView(): ng.IPromise<$syncChoreList>{
+		getChoresOverView(): ng.IPromise<ChoreList>{
 			var p = this.$q.defer();
 			
 			this.checkWeek().then(()=>{
-				var t = this.firebaseArray(this.thisweeksChores);
-				p.resolve(t);
+				this.thisweeksChores.once('value',d=>{
+					p.resolve(d.val());
+				})
 			})
 			
 			return p.promise;
