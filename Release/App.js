@@ -10,13 +10,18 @@ var Chores;
 (function (Chores) {
     var Services;
     (function (Services) {
+        /** Contains date utilities commonly used across the app */
         var dateSvc = (function () {
             function dateSvc() {
                 var d = new Date();
-                var yyyy = d.getFullYear().toString();
-                var mm = (d.getMonth() + 1).toString(); // getMonth() is zero-based
-                var dd = d.getDate().toString();
-                this._thisweek = yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]); // padding
+                //var yyyy = d.getFullYear().toString();
+                //var mm = (d.getMonth()+1).toString(); // getMonth() is zero-based
+                //var day = d.getDay();
+                var diff = d.getDate() - d.getDay() + (d.getDay() == 0 ? -6 : 1); // adjust when day is sunday
+                d.setDate(diff);
+                //var dd = d.getDate().toString(); 
+                this.startdate = d;
+                this._thisweek = this.dateToString(d); // padding
             }
             Object.defineProperty(dateSvc.prototype, "thisWeek", {
                 get: function () {
@@ -25,6 +30,28 @@ var Chores;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(dateSvc.prototype, "weekDates", {
+                get: function () {
+                    var d = this.startdate;
+                    var ret = [this.dateToString(d)];
+                    var i = 0;
+                    while (i < 7) {
+                        var p = new Date(d.setDate(d.getDate() + 1));
+                        ret.push(this.dateToString(p));
+                        i++;
+                    }
+                    return ret;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            /**Converts a data to a string in MMDDYYYY */
+            dateSvc.prototype.dateToString = function (d) {
+                var yyyy = d.getFullYear().toString();
+                var mm = (d.getMonth() + 1).toString(); // getMonth() is zero-based
+                var dd = d.getDate().toString();
+                return yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]);
+            };
             return dateSvc;
         })();
         Services.dateSvc = dateSvc;
@@ -44,7 +71,7 @@ var Chores;
                 this.$q = $q;
                 this.firebaseArray = $firebaseArray;
             }
-            /**Checks if the current week already exists, creates it if not - returns a promise */
+            /**Checks if the current week already exists, if not, it creates it via createWeek */
             fireBaseSvc.prototype.checkWeek = function () {
                 var _this = this;
                 var weekdate = this.dateSvc.thisWeek;
@@ -66,25 +93,21 @@ var Chores;
                 });
                 return p.promise;
             };
-            /** Creates a master record for the week on firebase, returns a promise */
+            /** Creates a master record for the week on firebase */
             fireBaseSvc.prototype.createWeek = function (weekdate) {
                 var _this = this;
                 var t = {};
-                var weeklyChores = { chores: {}, Meta: { Completed: false, CompletedOn: 0, Paid: false } };
+                var weeklyChores = { chores: [], Meta: { Completed: false, CompletedOn: 0, Paid: false } };
                 var p = this.$q.defer();
-                this.choresUrl.once("value", function (data) {
-                    var t = data.val();
-                    for (var p in t) {
-                        var c = t[p];
-                        c.completed = false;
-                        weeklyChores.chores[p] = c;
-                    }
+                this.buildChoreList().then(function (data) {
+                    weeklyChores.chores = data;
                     _this.weekly.child(weekdate).set(weeklyChores);
                     _this.thisweeksChores = _this.weekly.child(weekdate);
                     p.resolve();
                 });
                 return p.promise;
             };
+            /** Gets a to-do list for the chore-doer */
             fireBaseSvc.prototype.getChoreToDoList = function () {
                 var _this = this;
                 var p = this.$q.defer();
@@ -95,6 +118,7 @@ var Chores;
                 });
                 return p.promise;
             };
+            /** Gets progress for this weeks chore (chore master view) */
             fireBaseSvc.prototype.getChoresOverView = function () {
                 var _this = this;
                 var p = this.$q.defer();
@@ -105,13 +129,94 @@ var Chores;
                 });
                 return p.promise;
             };
-            fireBaseSvc.prototype.markweekComplete = function () {
+            /** Gets the master template list */
+            fireBaseSvc.prototype.getChoreTemplates = function () {
+                var p = this.$q.defer();
+                this.choresUrl.once('value', function (d) {
+                    p.resolve(d.val());
+                });
+                return p.promise;
+            };
+            /** Builds a list of due chores for current week from templates */
+            fireBaseSvc.prototype.buildChoreList = function () {
+                var p = this.$q.defer();
+                var ret = [];
+                var schedule = {};
+                var dates = this.dateSvc.weekDates;
+                this.getChoreTemplates().then(function (data) {
+                    Object.keys(data).forEach(function (d) {
+                        var chore = data[d];
+                        chore.Schedule.forEach(function (p, i) {
+                            if (p) {
+                                var b = {
+                                    Name: chore.Name,
+                                    Description: chore.Description,
+                                    Due: dates[i],
+                                    completed: false,
+                                    approved: false
+                                };
+                                ret.push(b);
+                            }
+                        });
+                    });
+                    p.resolve(ret);
+                });
+                return p.promise;
             };
             fireBaseSvc.$inject = ['$q', 'dateSvc', '$firebaseArray'];
             return fireBaseSvc;
         })();
         Services.fireBaseSvc = fireBaseSvc;
     })(Services = Chores.Services || (Chores.Services = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Directives;
+    (function (Directives) {
+        function choreTemplateList() {
+            return {
+                restrict: 'E',
+                controller: Chores.Controllers.ChoreTemplateListCtrl,
+                controllerAs: 'CTListCtrl',
+                templateUrl: './Templates/_ChoreTemplateList.html',
+                bindToController: true
+            };
+        }
+        Directives.choreTemplateList = choreTemplateList;
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var ChoreTemplateListCtrl = (function () {
+            function ChoreTemplateListCtrl(firebaseSvc) {
+                this.firebaseSvc = firebaseSvc;
+                this.load();
+            }
+            ChoreTemplateListCtrl.prototype.save = function () {
+                var _this = this;
+                this.firebaseSvc.choresUrl.set(this.choretemplates, function (e) {
+                    if (e) {
+                        console.log('There was a problem saving');
+                    }
+                    else {
+                        console.log('saved successfully');
+                        _this.load();
+                    }
+                });
+            };
+            ChoreTemplateListCtrl.prototype.load = function () {
+                var _this = this;
+                this.firebaseSvc.getChoreTemplates().then(function (data) {
+                    _this.choretemplates = data;
+                });
+            };
+            return ChoreTemplateListCtrl;
+        })();
+        Controllers.ChoreTemplateListCtrl = ChoreTemplateListCtrl;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
 })(Chores || (Chores = {}));
 ///<reference path="../../all.d.ts"/>
 var Chores;
@@ -144,6 +249,7 @@ var Chores;
                 });
             }
             ApprovalListController.prototype.approve = function () {
+                console.log('approving..');
                 this.firebaseSvc.thisweeksChores.child('Meta').child('Completed').set(true);
                 this.firebaseSvc.thisweeksChores.child('Meta').child('CompletedOn').set(new Date());
             };
@@ -198,19 +304,12 @@ var Chores;
             return {
                 restrict: 'EA',
                 require: '^choreList',
-                //templateURL: './Templates/Chore.html',
+                templateUrl: './Templates/_Chore.html',
                 controller: Chores.Controllers.ChoreController,
                 controllerAs: 'ChoreCtrl',
                 bindToController: true,
                 scope: { chore: '=' },
                 replace: true,
-                template: '<div ng-swipe-right="ChoreCtrl.complete()" class="card avatar lime accent-3">' +
-                    '<div class="card-content">' +
-                    '<img class="circle" ng-src="{{ChoreCtrl.imgSource}}"></img>' +
-                    '<span class="card-title">{{ChoreCtrl.chore.Name}}</span>' +
-                    '<p>{{ChoreCtrl.chore.Description}}</p>' +
-                    '</div>' +
-                    '</div>',
                 link: function (scope, el, attr, ctrl) {
                     scope.ChoreCtrl.complete = function () {
                         scope.ChoreCtrl.chore.completed = true;
@@ -249,12 +348,19 @@ var Chores;
             $routeProvider.
                 when('/History', {
                 templateUrl: 'Templates/History.html',
+                resolve: {}
             }).
                 when('/Approve', {
                 templateUrl: 'Templates/Approval.html',
+                resolve: {}
+            }).
+                when('/Settings', {
+                templateUrl: 'Templates/Settings.html',
+                resolve: {}
             }).
                 when('/', {
-                templateUrl: 'Templates/Chorelist.html'
+                templateUrl: 'Templates/Chorelist.html',
+                resolve: {}
             }).
                 otherwise({
                 redirectTo: '/'

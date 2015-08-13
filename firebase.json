@@ -1,0 +1,17 @@
+{
+  "firebase": "shining-torch-394",
+  "public": ".",
+  "ignore": [
+    "firebase.json",
+    "tsconfig.json",
+    "**/Code/**",
+    "**/Interfaces/**",
+    "**/*.ts",
+    "**/node_modules/**",
+    "**/.settings/**"
+  ],
+  "rewrites": [ {
+  "source": "**",
+  "destination": "/index.html"
+  }]
+}

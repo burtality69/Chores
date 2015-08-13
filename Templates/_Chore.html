@@ -1,8 +1,11 @@
-<li class="collection-item avatar">
-      <img src="images/yuna.jpg" alt="" class="circle">
-      <span class="title">Title</span>
-      <p>{{ChoreCtrl.chore.name}}</p>
-      <a href="#!" class="secondary-content">
-            <i class="material-icons">grade</i>
-      </a>
-</li>
+<div ng-swipe-right="ChoreCtrl.complete()" class="card avatar lime accent-3">
+	<div class="card-content">
+		<img class="circle" ng-src="{{ChoreCtrl.imgSource}}"></img>
+		<span class="card-title">{{ChoreCtrl.chore.Name}}</span>
+		<p>{{ChoreCtrl.chore.Description}}</p>
+		<span class="secondary-content">
+			<input type="checkbox" class="filled-in" id="completed" ng-model="ChoreCtrl.chore.completed" ng-click="ChoreCtrl.complete()"/>
+			<label for="completed"></label>
+		</span>
+	</div>
+</div>

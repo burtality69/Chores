@@ -1,5 +1,6 @@
 ///<reference path="./typings/firebase.d.ts"/>
 ///<reference path="./typings/angularjs/angular.d.ts"/>
+///<reference path="./typings/angularjs/angular-route.d.ts"/>
 ///<reference path="./typings/angularfire.d.ts"/>
 
 ///<reference path="./interfaces/choreTemplate.ts"/>
@@ -9,7 +10,11 @@
 
 ///<reference path="./code/services/dateSvc.ts"/>
 ///<reference path="./code/services/firebaseSvc.ts"/>
+
+///<reference path="./code/directives/choretemplatelist.ts"/>
 ///<reference path="./code/directives/approvallist.ts"/>
 ///<reference path="./code/directives/chorelist.ts"/>
 ///<reference path="./code/directives/chore.ts"/>
+
+///referece path="./code/animations/drag.ts"/>
 ///<reference path="./code/app.ts"/>

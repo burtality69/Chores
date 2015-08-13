@@ -1,12 +1,12 @@
 <div>
 	<ul class="collection">
 		<li class="collection-item" ng-repeat="chore in ApprovalCtrl.chorelist.chores" chore="chore">
-			<div>{{chore.Name}}</div>
-			<p class="secondary-content">
-				<label for="completed"></label>
-				<input type="checkbox" class="filled-in" id="completed" ng-checked="{{chore.completed}}"/>
-			</p>
+				<span>{{chore.Name}}</span>
+				<span class="secondary-content">
+					<input type="checkbox" class="filled-in" id="completed" ng-checked="{{chore.completed}}"/>
+					<label for="completed"></label>
+				</span>
 		</li>
 	</ul>
-	<button class="btn waves-effect waves-light" ng-click="ApprovalCtrl.approveAll()" name="action">Approve all</button>
+	<button class="btn waves-effect waves-light" ng-click="ApprovalCtrl.approve()" name="action">Approve all</button>
 </div>

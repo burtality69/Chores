@@ -1,0 +1,27 @@
+<div class="card">
+	<div class="card-content">
+		<ul class="collection">
+			<li class="collection-item" ng-repeat="t in CTListCtrl.choretemplates" template="t">
+				<span class="title"> {{t.Name}} </span>
+				<span> {{t.Description}} </span>
+				<span class="secondary-content">
+					<input type="checkbox" class="filled-in" id="{{$index}}0" ng-model="t.Schedule[0]"/>
+					<label for="{{$index}}0">Monday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}1" ng-model="t.Schedule[1]"/>
+					<label for="{{$index}}1">Tuesday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}2" ng-model="t.Schedule[2]"/>
+					<label for="{{$index}}2">Wednesday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}3" ng-model="t.Schedule[3]"/>
+					<label for="{{$index}}3">Thursday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}4" ng-model="t.Schedule[4]"/>
+					<label for="{{$index}}4">Friday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}5" ng-model="t.Schedule[5]"/>
+					<label for="{{$index}5">Saturday</label>
+					<input type="checkbox" class="filled-in" id="{{$index}}6" ng-model="t.Schedule[6]"/>
+					<label for="{{$index}}6">Sunday</label>
+				</span>
+			</li>
+		</ul>
+		<button class="btn waves-effect waves-light" ng-click="CTListCtrl.save()" name="action">Save changes</button>
+	</div>
+</div>
