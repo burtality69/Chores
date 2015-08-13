@@ -2,11 +2,11 @@
 interface Chore extends ChoreTemplate {
 	completed: boolean,
 	approved: boolean,
-	Due: Date | string
+	Due: number
 }
 
 interface $SyncChore extends AngularFireSimpleObject {
 	completed: boolean,
 	approved: boolean,
-	Due: Date | String
+	Due: number
 }

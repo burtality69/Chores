@@ -27,14 +27,18 @@ module Chores.Services {
 		get weekDates() {
 			
 			var d = this.startdate;
-			var ret: string[] = [this.dateToString(d)];
+			var ret: number[] = [d.getTime()];
 			var i = 0; 
 			while(i<7) {
 				var p = new Date(d.setDate(d.getDate()+1))
-				ret.push(this.dateToString(p))
+				ret.push(p.getTime())
 				i++
 			}
 			return ret;
+		}
+		
+		get today(): number {
+			return new Date().getTime();
 		}
 		
 		/**Converts a data to a string in MMDDYYYY */

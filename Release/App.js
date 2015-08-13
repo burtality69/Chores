@@ -33,14 +33,21 @@ var Chores;
             Object.defineProperty(dateSvc.prototype, "weekDates", {
                 get: function () {
                     var d = this.startdate;
-                    var ret = [this.dateToString(d)];
+                    var ret = [d.getTime()];
                     var i = 0;
                     while (i < 7) {
                         var p = new Date(d.setDate(d.getDate() + 1));
-                        ret.push(this.dateToString(p));
+                        ret.push(p.getTime());
                         i++;
                     }
                     return ret;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(dateSvc.prototype, "today", {
+                get: function () {
+                    return new Date().getTime();
                 },
                 enumerable: true,
                 configurable: true
@@ -282,7 +289,7 @@ var Chores;
     var Controllers;
     (function (Controllers) {
         var chorelistController = (function () {
-            function chorelistController(fireBaseSvc) {
+            function chorelistController(fireBaseSvc, dateSvc) {
                 var _this = this;
                 this.firebaseSvc = fireBaseSvc;
                 this.firebaseSvc.getChoreToDoList().then(function (p) {

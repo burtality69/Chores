@@ -22,7 +22,7 @@ module Chores.Controllers {
 		public firebaseSvc: Chores.Services.fireBaseSvc;
 		public firebaseArray: AngularFireArrayService;
 		
-		constructor(fireBaseSvc: Chores.Services.fireBaseSvc) {
+		constructor(fireBaseSvc: Chores.Services.fireBaseSvc, dateSvc: Chores.Services.dateSvc) {
 			
 			this.firebaseSvc = fireBaseSvc;
 			this.firebaseSvc.getChoreToDoList().then((p)=>{

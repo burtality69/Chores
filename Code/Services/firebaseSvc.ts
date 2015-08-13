@@ -58,20 +58,17 @@ module Chores.Services {
 				this.thisweeksChores = this.weekly.child(weekdate);
 				p.resolve();
 			});
-
 			
 			return p.promise;
 		}
 		
 		/** Gets a to-do list for the chore-doer */
-		getChoreToDoList(): ng.IPromise<$syncChoreList> {
+		getChoreToDoList(): ng.IPromise<$SyncChoreList> {
 			var p = this.$q.defer();
 
 			this.checkWeek().then(() => {
 				var query = this.thisweeksChores.child('chores').orderByChild('completed').equalTo(false);
-				var t = this.firebaseArray(query).filter(d =>{
-					return d.$id == '1'; 
-				}); 
+				var t = this.firebaseArray(query);
 				p.resolve(t);
 			})
 
@@ -108,7 +105,7 @@ module Chores.Services {
 			var p = this.$q.defer();
 			var ret: Chore[] = [];
 			var schedule = {}
-			var dates: string[] = this.dateSvc.weekDates;
+			var dates: number[] = this.dateSvc.weekDates;
 			
 			this.getChoreTemplates().then(data=>{
 				Object.keys(data).forEach((d)=>{
