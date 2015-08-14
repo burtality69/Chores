@@ -4,7 +4,7 @@ module Chores.Directives {
 	export function choreList(): ng.IDirective {
 		return {
 			restrict: 'EA',
-			templateUrl: './Views/Templates/Chorelist.htm',
+			templateUrl: './Views/Templates/ChoreList.htm',
 			bindToController: true,
 			controller: Chores.Controllers.chorelistController,
 			controllerAs: 'ChoreListCtrl',

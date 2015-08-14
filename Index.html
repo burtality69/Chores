@@ -7,6 +7,8 @@
 		<script src="./Dependencies/angular-touch.min.js"></script>
 		<script src="./Dependencies/angularfire.min.js"></script>
 		<script src="./Dependencies/angular-route.min.js"></script>
+		<script src="./Dependencies/angular-cookies.min.js"></script>
+		<script src="./Dependencies/angular-modal-service.min.js"></script>
 		<script src="./Release/App.js"></script>
 		
 		<link rel="stylesheet" type="text/css" href="./Styles/Site.css">
@@ -14,22 +16,22 @@
 		<base href="/">
 	</head>
 	
+<body ng-app="Chores">
+
 	<nav>
-	    <div class="nav-wrapper">
-	      <a href="/" class="brand-logo">Chores</a>
-	      <ul id="nav-mobile" class="right hide-on-med-and-down">
-	        <li><a href="Approve">Approve</a></li>
-	        <li><a href="History">History</a></li>
-			<li><a href="Settings">Settings</a></li>
-	      </ul>
-	    </div>
-  	</nav>
-	
-	<body ng-app="Chores">
-		<section ng-view id="main">
-			
-		</section>
-	</body>
+		<div class="nav-wrapper">
+			<a href="/" class="brand-logo">Chores</a>
+			<ul id="nav-mobile" class="right hide-on-med-and-down">
+				<li><a href="Approve">Approve</a></li>
+				<li><a href="History">History</a></li>
+				<li><a href="Settings">Settings</a></li>
+			</ul>
+			<login-panel></login-panel>
+		</div>
+	</nav>
+	<section ng-view id="main">
+	</section>
+</body>
 	
 	<footer></footer>
 

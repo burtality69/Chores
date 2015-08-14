@@ -3,7 +3,9 @@
 module Chores.Services {
 
 	export class fireBaseSvc {
+		/**The root firebase service */
 		public firebase: Firebase;
+		/**Chore templates endpoint */
 		public choresUrl: Firebase;
 		public dateSvc: dateSvc;
 		public weekly: Firebase

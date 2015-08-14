@@ -10,6 +10,36 @@ var Chores;
 (function (Chores) {
     var Services;
     (function (Services) {
+        var SessionSvc = (function () {
+            function SessionSvc($cookies, firebaseSvc) {
+            }
+            SessionSvc.prototype.logIn = function (credentials) {
+                var _this = this;
+                this.fireBaseSvc.firebase.authWithPassword(credentials, function (e, a) {
+                    _this.$cookies.put('Authtoken', a.token);
+                });
+            };
+            SessionSvc.prototype.logOut = function () {
+                this.$cookies.remove('Authtoken');
+            };
+            Object.defineProperty(SessionSvc.prototype, "userLoggedIn", {
+                get: function () {
+                    return this.$cookies.get('Authtoken').length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            SessionSvc.$inject = ['$cookies'];
+            return SessionSvc;
+        })();
+        Services.SessionSvc = SessionSvc;
+    })(Services = Chores.Services || (Chores.Services = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Services;
+    (function (Services) {
         /** Contains date utilities commonly used across the app */
         var dateSvc = (function () {
             function dateSvc() {
@@ -198,6 +228,65 @@ var Chores;
 (function (Chores) {
     var Directives;
     (function (Directives) {
+        function loginPanel() {
+            return {
+                restrict: 'E',
+                controller: Chores.Controllers.loginPanelCtrl,
+                controllerAs: 'loginPanelCtrl',
+                replace: true,
+                templateUrl: './Views/Templates/LoginPanel.htm'
+            };
+        }
+        Directives.loginPanel = loginPanel;
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var loginPanelCtrl = (function () {
+            function loginPanelCtrl(sessionSvc, ModalService) {
+                this.sessionSvc = sessionSvc;
+                this.ModalService = ModalService;
+            }
+            loginPanelCtrl.prototype.login = function () {
+                this.ModalService.showModal({
+                    controller: 'LoginModalCtrl',
+                    templateUrl: './Views/Templates/LoginRegister.htm'
+                }).then(function (modal) {
+                    modal.close.then(function (a) {
+                        console.log('Modal closed');
+                    });
+                });
+            };
+            loginPanelCtrl.prototype.logOut = function () {
+            };
+            loginPanelCtrl.$inject = ['sessionSvc', 'ModalService'];
+            return loginPanelCtrl;
+        })();
+        Controllers.loginPanelCtrl = loginPanelCtrl;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var LoginModalCtrl = (function () {
+            function LoginModalCtrl($scope, close) {
+                this.close = close;
+                this.loginForm = { email: '', password: '' };
+            }
+            LoginModalCtrl.$inject = ['$scope', 'close'];
+            return LoginModalCtrl;
+        })();
+        Controllers.LoginModalCtrl = LoginModalCtrl;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Directives;
+    (function (Directives) {
         function choreTemplateList() {
             return {
                 restrict: 'E',
@@ -291,7 +380,7 @@ var Chores;
         function choreList() {
             return {
                 restrict: 'EA',
-                templateUrl: './Views/Templates/Chorelist.htm',
+                templateUrl: './Views/Templates/ChoreList.htm',
                 bindToController: true,
                 controller: Chores.Controllers.chorelistController,
                 controllerAs: 'ChoreListCtrl',
@@ -368,9 +457,10 @@ var Chores;
 ///<reference path="../all.d.ts"/>
 var Chores;
 (function (Chores) {
-    var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch', 'ngRoute'])
+    var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch', 'ngRoute', , 'ngCookies', 'angularModalService'])
         .service('dateSvc', Chores.Services.dateSvc)
         .service('firebaseSvc', Chores.Services.fireBaseSvc)
+        .service('sessionSvc', Chores.Services.SessionSvc)
         .controller(Chores.Controllers)
         .directive(Chores.Directives);
     app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
