@@ -1,0 +1,11 @@
+<div ng-swipe-right="ChoreCtrl.complete()" class="card avatar lime accent-3">
+	<div class="card-content">
+		<img class="circle" ng-src="{{::ChoreCtrl.imgSource}}"></img>
+		<span class="card-title">{{::ChoreCtrl.chore.Name}}</span>
+		<p>{{::ChoreCtrl.chore.Description}}</p>
+		<span class="secondary-content">
+			<input type="checkbox" class="filled-in" id="{{::ChoreCtrl.chore.$id}}" ng-model="ChoreCtrl.chore.completed" ng-click="ChoreCtrl.complete()"/>
+			<label for="{{::ChoreCtrl.chore.$id}}"></label>
+		</span>
+	</div>
+</div>

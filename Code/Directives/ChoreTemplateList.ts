@@ -6,7 +6,7 @@ module Chores.Directives{
 			restrict: 'E',
 			controller: Chores.Controllers.ChoreTemplateListCtrl,
 			controllerAs: 'CTListCtrl',
-			templateUrl: './Templates/_ChoreTemplateList.html',
+			templateUrl: './Views/Templates/ChoreTemplateList.html',
 			bindToController: true			
 		}
 	}

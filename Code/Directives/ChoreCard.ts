@@ -2,19 +2,17 @@
 
 module Chores.Directives {
 	
-	interface IChoreControllerScope extends ng.IScope {
-		ChoreCtrl: Chores.Controllers.ChoreController;
-	}
+	
 	
 	export function choreCard(): ng.IDirective {
 		return {
 			restrict: 'EA',
 			require: '^choreList',
-			templateUrl: './Templates/_Chore.html',
+			templateUrl: './Views/Templates/ChoreCard.htm',
 			controller: Chores.Controllers.ChoreController,
-			controllerAs: 'ChoreCtrl',
+			//controllerAs: 'ChoreCtrl',
 			bindToController: true,
-			scope: {chore: '='},
+			scope: false,
 			replace: true,
 		    link: (scope: IChoreControllerScope, el:Element, attr: ng.IAugmentedJQuery,ctrl: Chores.Controllers.chorelistController) =>{
 				scope.ChoreCtrl.complete = ()=> {
@@ -29,10 +27,14 @@ module Chores.Directives {
 
 }
 
+interface IChoreControllerScope extends ng.IScope {
+		ChoreCtrl: Chores.Controllers.ChoreController;
+		chore: Chore
+	}
 module Chores.Controllers {
 	export class ChoreController {
 		
-		static $inject = ['firebaseSvc'];
+		static $inject = ['$scope'];
 		
 		public chore: Chore;
 		public firebaseSvc: Chores.Services.fireBaseSvc;
@@ -40,7 +42,9 @@ module Chores.Controllers {
 		public imgSource: string;
 		public Dismiss: ()=>void;
 
-		constructor() {
+		constructor($scope: IChoreControllerScope) {
+			$scope.ChoreCtrl = this;
+			this.chore = $scope.chore; 
 			this.imgSource = './Images/' + this.chore.Image + '.png'
 		}
 

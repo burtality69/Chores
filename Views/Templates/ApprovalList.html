@@ -4,8 +4,8 @@
 				<span>{{chore.Name}}</span>
 				<span>{{chore.Due}}</span>
 				<span class="secondary-content">
-					<input type="checkbox" class="filled-in" id="completed" ng-checked="{{chore.completed}}"/>
-					<label for="completed"></label>
+					<input type="checkbox" class="filled-in" id="{{$index}}" ng-checked="{{chore.completed}}"/>
+					<label for="{{$index}}"></label>
 				</span>
 		</li>
 	</ul>

@@ -4,7 +4,7 @@ module Chores.Directives {
 	export function choreList(): ng.IDirective {
 		return {
 			restrict: 'EA',
-			templateUrl: './Templates/_Chorelist.html',
+			templateUrl: './Views/Templates/Chorelist.htm',
 			bindToController: true,
 			controller: Chores.Controllers.chorelistController,
 			controllerAs: 'ChoreListCtrl',
@@ -16,18 +16,22 @@ module Chores.Directives {
 module Chores.Controllers {
 	export class chorelistController {
 		
-		static $inject = ['firebaseSvc'];
+		static $inject = ['firebaseSvc','dateSvc'];
 		
 		public chorelist: AngularFireArray;
 		public firebaseSvc: Chores.Services.fireBaseSvc;
 		public firebaseArray: AngularFireArrayService;
+		public filterDate: number;
 		
 		constructor(fireBaseSvc: Chores.Services.fireBaseSvc, dateSvc: Chores.Services.dateSvc) {
 			
 			this.firebaseSvc = fireBaseSvc;
 			this.firebaseSvc.getChoreToDoList().then((p)=>{
-				this.chorelist = p;
+					p.$loaded().then(d=>{
+						this.chorelist = d;
+					})
 			})
+			this.filterDate = dateSvc.today;
 		}
 		
 	}

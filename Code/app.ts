@@ -11,19 +11,19 @@ module Chores {
   app.config(['$routeProvider','$locationProvider', ($routeProvider: ng.route.IRouteProvider,$locationProvider: ng.ILocationProvider) => {
     $routeProvider.
       when('/History', {
-        templateUrl: 'Templates/History.html',
+        templateUrl: 'Views/History.html',
         resolve: {}
       }).
       when('/Approve', {
-        templateUrl: 'Templates/Approval.html',
+        templateUrl: 'Views/Approval.html',
         resolve: {}
       }).
       when('/Settings', {
-        templateUrl: 'Templates/Settings.html',
+        templateUrl: 'Views/Settings.html',
         resolve: {}        
       }).
       when('/',{
-        templateUrl: 'Templates/Chorelist.html',
+        templateUrl: 'Views/Chorelist.html',
         resolve: {}
       }).
       otherwise({

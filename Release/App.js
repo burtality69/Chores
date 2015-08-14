@@ -19,11 +19,13 @@ var Chores;
                 //var day = d.getDay();
                 var diff = d.getDate() - d.getDay() + (d.getDay() == 0 ? -6 : 1); // adjust when day is sunday
                 d.setDate(diff);
-                //var dd = d.getDate().toString(); 
-                this.startdate = d;
+                //var dd = d.getDate().toString();
+                this.weekstartDate = d;
+                this._weekstart = d.getTime();
                 this._thisweek = this.dateToString(d); // padding
             }
             Object.defineProperty(dateSvc.prototype, "thisWeek", {
+                /**Returns the first day of the week in DDMMYYY */
                 get: function () {
                     return this._thisweek;
                 },
@@ -31,12 +33,15 @@ var Chores;
                 configurable: true
             });
             Object.defineProperty(dateSvc.prototype, "weekDates", {
+                /**Returns an array of timestamps representing each day of the week at midnight */
                 get: function () {
-                    var d = this.startdate;
+                    var d = this.weekstartDate;
                     var ret = [d.getTime()];
                     var i = 0;
+                    //Create an array of dates for this week all midnight
                     while (i < 7) {
                         var p = new Date(d.setDate(d.getDate() + 1));
+                        p.setHours(0, 0, 0, 0);
                         ret.push(p.getTime());
                         i++;
                     }
@@ -46,8 +51,19 @@ var Chores;
                 configurable: true
             });
             Object.defineProperty(dateSvc.prototype, "today", {
+                /**Returns today at 23:59:59 in timestamp, used to filter 'Due' */
                 get: function () {
-                    return new Date().getTime();
+                    var d = new Date();
+                    d.setHours(23, 59, 59, 9999);
+                    return d.getTime();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(dateSvc.prototype, "weekStart", {
+                /**Returns the start of the week in timestamp form */
+                get: function () {
+                    return this._weekstart;
                 },
                 enumerable: true,
                 configurable: true
@@ -118,10 +134,11 @@ var Chores;
             fireBaseSvc.prototype.getChoreToDoList = function () {
                 var _this = this;
                 var p = this.$q.defer();
+                var start = this.dateSvc.weekStart;
+                var end = this.dateSvc.today;
                 this.checkWeek().then(function () {
                     var query = _this.thisweeksChores.child('chores').orderByChild('completed').equalTo(false);
-                    var t = _this.firebaseArray(query);
-                    p.resolve(t);
+                    p.resolve(_this.firebaseArray(query));
                 });
                 return p.promise;
             };
@@ -186,7 +203,7 @@ var Chores;
                 restrict: 'E',
                 controller: Chores.Controllers.ChoreTemplateListCtrl,
                 controllerAs: 'CTListCtrl',
-                templateUrl: './Templates/_ChoreTemplateList.html',
+                templateUrl: './Views/Templates/ChoreTemplateList.html',
                 bindToController: true
             };
         }
@@ -233,7 +250,7 @@ var Chores;
         function approvalList() {
             return {
                 restrict: 'EA',
-                templateUrl: './Templates/_ApprovalList.html',
+                templateUrl: './Views/Templates/ApprovalList.html',
                 controller: Chores.Controllers.ApprovalListController,
                 controllerAs: 'ApprovalCtrl',
                 bindToController: true,
@@ -274,7 +291,7 @@ var Chores;
         function choreList() {
             return {
                 restrict: 'EA',
-                templateUrl: './Templates/_Chorelist.html',
+                templateUrl: './Views/Templates/Chorelist.htm',
                 bindToController: true,
                 controller: Chores.Controllers.chorelistController,
                 controllerAs: 'ChoreListCtrl',
@@ -293,10 +310,13 @@ var Chores;
                 var _this = this;
                 this.firebaseSvc = fireBaseSvc;
                 this.firebaseSvc.getChoreToDoList().then(function (p) {
-                    _this.chorelist = p;
+                    p.$loaded().then(function (d) {
+                        _this.chorelist = d;
+                    });
                 });
+                this.filterDate = dateSvc.today;
             }
-            chorelistController.$inject = ['firebaseSvc'];
+            chorelistController.$inject = ['firebaseSvc', 'dateSvc'];
             return chorelistController;
         })();
         Controllers.chorelistController = chorelistController;
@@ -311,11 +331,11 @@ var Chores;
             return {
                 restrict: 'EA',
                 require: '^choreList',
-                templateUrl: './Templates/_Chore.html',
+                templateUrl: './Views/Templates/ChoreCard.htm',
                 controller: Chores.Controllers.ChoreController,
-                controllerAs: 'ChoreCtrl',
+                //controllerAs: 'ChoreCtrl',
                 bindToController: true,
-                scope: { chore: '=' },
+                scope: false,
                 replace: true,
                 link: function (scope, el, attr, ctrl) {
                     scope.ChoreCtrl.complete = function () {
@@ -334,10 +354,12 @@ var Chores;
     var Controllers;
     (function (Controllers) {
         var ChoreController = (function () {
-            function ChoreController() {
+            function ChoreController($scope) {
+                $scope.ChoreCtrl = this;
+                this.chore = $scope.chore;
                 this.imgSource = './Images/' + this.chore.Image + '.png';
             }
-            ChoreController.$inject = ['firebaseSvc'];
+            ChoreController.$inject = ['$scope'];
             return ChoreController;
         })();
         Controllers.ChoreController = ChoreController;
@@ -354,19 +376,19 @@ var Chores;
     app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
             $routeProvider.
                 when('/History', {
-                templateUrl: 'Templates/History.html',
+                templateUrl: 'Views/History.html',
                 resolve: {}
             }).
                 when('/Approve', {
-                templateUrl: 'Templates/Approval.html',
+                templateUrl: 'Views/Approval.html',
                 resolve: {}
             }).
                 when('/Settings', {
-                templateUrl: 'Templates/Settings.html',
+                templateUrl: 'Views/Settings.html',
                 resolve: {}
             }).
                 when('/', {
-                templateUrl: 'Templates/Chorelist.html',
+                templateUrl: 'Views/Chorelist.html',
                 resolve: {}
             }).
                 otherwise({

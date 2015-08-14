@@ -4,7 +4,7 @@ module Chores.Directives {
 	export function approvalList(): ng.IDirective {
 		return {
 			restrict: 'EA',
-			templateUrl: './Templates/_ApprovalList.html',
+			templateUrl: './Views/Templates/ApprovalList.html',
 			controller: Chores.Controllers.ApprovalListController,
 			controllerAs: 'ApprovalCtrl',
 			bindToController: true,

@@ -4,6 +4,8 @@
   "ignore": [
     "firebase.json",
     "tsconfig.json",
+    ".gitattributes",
+    ".gitignore",
     "**/Code/**",
     "**/Interfaces/**",
     "**/*.ts",

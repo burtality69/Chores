@@ -14,7 +14,7 @@
 ///<reference path="./code/directives/choretemplatelist.ts"/>
 ///<reference path="./code/directives/approvallist.ts"/>
 ///<reference path="./code/directives/chorelist.ts"/>
-///<reference path="./code/directives/chore.ts"/>
+///<reference path="./code/directives/chorecard.ts"/>
 
 ///referece path="./code/animations/drag.ts"/>
 ///<reference path="./code/app.ts"/>

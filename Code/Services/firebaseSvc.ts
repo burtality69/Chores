@@ -65,11 +65,11 @@ module Chores.Services {
 		/** Gets a to-do list for the chore-doer */
 		getChoreToDoList(): ng.IPromise<$SyncChoreList> {
 			var p = this.$q.defer();
-
+			var start = this.dateSvc.weekStart;
+			var end = this.dateSvc.today;
 			this.checkWeek().then(() => {
 				var query = this.thisweeksChores.child('chores').orderByChild('completed').equalTo(false);
-				var t = this.firebaseArray(query);
-				p.resolve(t);
+				p.resolve(this.firebaseArray(query));
 			})
 
 			return p.promise;
