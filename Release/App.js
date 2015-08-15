@@ -12,11 +12,35 @@ var Chores;
 (function (Chores) {
     var Services;
     (function (Services) {
+        var sessionStorageSvc = (function () {
+            function sessionStorageSvc($window) {
+                this.$window = $window;
+            }
+            sessionStorageSvc.prototype.put = function (key, value) {
+                this.$window.sessionStorage.setItem(key, value);
+            };
+            sessionStorageSvc.prototype.get = function (key) {
+                return this.$window.sessionStorage.getItem(key);
+            };
+            sessionStorageSvc.prototype.delete = function (key) {
+                this.$window.sessionStorage.removeItem(key);
+            };
+            return sessionStorageSvc;
+        })();
+        Services.sessionStorageSvc = sessionStorageSvc;
+    })(Services = Chores.Services || (Chores.Services = {}));
+})(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Services;
+    (function (Services) {
         var sessionSvc = (function () {
-            function sessionSvc($cookies, firebaseSvc, $q) {
+            function sessionSvc($cookies, fireBaseSvc, $q, sessionStorageSvc) {
                 this.$cookies = $cookies;
-                this.fireBaseSvc = firebaseSvc;
+                this.fireBaseSvc = fireBaseSvc;
                 this.$q = $q;
+                this.sessionStorageSvc = sessionStorageSvc;
             }
             sessionSvc.prototype.logIn = function (credentials) {
                 var _this = this;
@@ -25,21 +49,24 @@ var Chores;
                     if (e) {
                         p.reject(e);
                     }
-                    else {
-                        _this.$cookies.put('Authtoken', a.token);
-                        _this.fireBaseSvc.getUserProfile(a.uid).then(function (profile) {
-                            _this._profile = profile;
-                            p.resolve(a);
-                        });
-                    }
+                    _this.$cookies.put('Authtoken', a.token);
+                    _this.fireBaseSvc.getUserProfile(a.uid).then(function (profile) {
+                        _this._profile = profile;
+                        _this.sessionStorageSvc.put('Profile', JSON.stringify(profile));
+                        p.resolve(a);
+                    });
                 });
                 return p.promise;
             };
             sessionSvc.prototype.logOut = function () {
                 this.$cookies.remove('Authtoken');
+                this.sessionStorageSvc.delete('Profile');
             };
             Object.defineProperty(sessionSvc.prototype, "Profile", {
                 get: function () {
+                    if (!this._profile) {
+                        return JSON.parse(this.sessionStorageSvc.get('Profile'));
+                    }
                     return this._profile;
                 },
                 set: function (p) {
@@ -55,7 +82,7 @@ var Chores;
                 enumerable: true,
                 configurable: true
             });
-            sessionSvc.$inject = ['$cookies', 'firebaseSvc', '$q'];
+            sessionSvc.$inject = ['$cookies', 'firebaseSvc', '$q', 'sessionStorageSvc'];
             return sessionSvc;
         })();
         Services.sessionSvc = sessionSvc;
@@ -142,28 +169,28 @@ var Chores;
     var Services;
     (function (Services) {
         var fireBaseSvc = (function () {
-            function fireBaseSvc($q, dateSvc, $firebaseArray) {
+            function fireBaseSvc($q, dateSvc, AngularFireArray) {
+                this.$q = $q;
                 this.dateSvc = dateSvc;
+                this.AngularFireArray = AngularFireArray;
                 this.firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
                 this.choresUrl = this.firebase.child("Chores");
                 this.weekly = this.firebase.child("Weekly");
-                this.$q = $q;
-                this.firebaseArray = $firebaseArray;
+                this.meta = this.firebase.child("Meta");
+                this.weekdate = dateSvc.thisWeek;
             }
             /**Checks if the current week already exists, if not, it creates it via createWeek */
             fireBaseSvc.prototype.checkWeek = function () {
                 var _this = this;
-                var weekdate = this.dateSvc.thisWeek;
                 var exists = false;
                 var p = this.$q.defer();
                 //Short circuit here if value is found
-                this.weekly.child(weekdate).once("value", function (data) {
+                this.weekly.child(this.weekdate).once("value", function (data) {
                     if (data.val() !== null) {
-                        _this.thisweeksChores = _this.weekly.child(weekdate);
                         p.resolve();
                     }
                     else {
-                        _this.createWeek(weekdate).then(function () {
+                        _this.createWeek(_this.weekdate).then(function () {
                             p.resolve(true);
                         }, function (error) {
                             throw new Error(error);
@@ -172,24 +199,19 @@ var Chores;
                 });
                 return p.promise;
             };
+            /** Returns the meta for each available week of chores */
+            fireBaseSvc.prototype.getChoreHistory = function () {
+                var p = this.$q.defer();
+                this.firebase.child('Meta').once('value', function (data) {
+                    p.resolve(data.val());
+                });
+                return p.promise;
+            };
+            /** Returns the profile of a user by UID - for execution after authorisatin */
             fireBaseSvc.prototype.getUserProfile = function (UID) {
                 var p = this.$q.defer();
                 this.firebase.child('Users').child(UID).once('value', function (d) {
                     p.resolve(d.val());
-                });
-                return p.promise;
-            };
-            /** Creates a master record for the week on firebase */
-            fireBaseSvc.prototype.createWeek = function (weekdate) {
-                var _this = this;
-                var t = {};
-                var weeklyChores = { chores: [], Meta: { Completed: false, CompletedOn: 0, Paid: false } };
-                var p = this.$q.defer();
-                this.buildChoreList().then(function (data) {
-                    weeklyChores.chores = data;
-                    _this.weekly.child(weekdate).set(weeklyChores);
-                    _this.thisweeksChores = _this.weekly.child(weekdate);
-                    p.resolve();
                 });
                 return p.promise;
             };
@@ -200,8 +222,25 @@ var Chores;
                 var start = this.dateSvc.weekStart;
                 var end = this.dateSvc.today;
                 this.checkWeek().then(function () {
-                    var query = _this.thisweeksChores.child('chores').orderByChild('completed').equalTo(false);
-                    p.resolve(_this.firebaseArray(query));
+                    var query = _this.firebase.child('Weekly').child(_this.weekdate).orderByChild('completed').equalTo(false);
+                    p.resolve(_this.AngularFireArray(query));
+                });
+                return p.promise;
+            };
+            fireBaseSvc.prototype.approveWeek = function () {
+                var now = new Date().getTime();
+                this.firebase.child('Meta').child(this.weekdate).update({ Completed: true, CompletedOn: now });
+            };
+            /** Creates a master record for the week on firebase */
+            fireBaseSvc.prototype.createWeek = function (weekdate) {
+                var _this = this;
+                var t = {};
+                var weeklyMeta = { Completed: false, CompletedOn: 0, Paid: false };
+                var p = this.$q.defer();
+                this.buildChoreList().then(function (data) {
+                    _this.meta.child(_this.weekdate).set(weeklyMeta);
+                    _this.weekly.child(weekdate).set(data);
+                    p.resolve();
                 });
                 return p.promise;
             };
@@ -210,7 +249,7 @@ var Chores;
                 var _this = this;
                 var p = this.$q.defer();
                 this.checkWeek().then(function () {
-                    _this.thisweeksChores.once('value', function (d) {
+                    _this.firebase.child('Weekly').child(_this.weekdate).once('value', function (d) {
                         p.resolve(d.val());
                     });
                 });
@@ -237,6 +276,7 @@ var Chores;
                             if (p) {
                                 var b = {
                                     Name: chore.Name,
+                                    imgSource: chore.Image,
                                     Description: chore.Description,
                                     Due: dates[i],
                                     completed: false,
@@ -416,8 +456,7 @@ var Chores;
             }
             ApprovalListController.prototype.approve = function () {
                 console.log('approving..');
-                this.firebaseSvc.thisweeksChores.child('Meta').child('Completed').set(true);
-                this.firebaseSvc.thisweeksChores.child('Meta').child('CompletedOn').set(new Date());
+                this.firebaseSvc.approveWeek();
             };
             ApprovalListController.$inject = ['firebaseSvc', '$firebaseArray'];
             return ApprovalListController;
@@ -507,12 +546,50 @@ var Chores;
         Controllers.ChoreController = ChoreController;
     })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
 })(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>
+var Chores;
+(function (Chores) {
+    var Directives;
+    (function (Directives) {
+        function choreHistoryList() {
+            return {
+                restrict: 'E',
+                controller: Chores.Controllers.ChoreHistoryCtrl,
+                controlleras: 'HistoryCtrl',
+                bindToController: true,
+                replace: true,
+                templateUrl: '/Views/Templates/ChoreHistoryList.htm'
+            };
+        }
+        Directives.choreHistoryList = choreHistoryList;
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
+})(Chores || (Chores = {}));
+var Chores;
+(function (Chores) {
+    var Controllers;
+    (function (Controllers) {
+        var ChoreHistoryCtrl = (function () {
+            function ChoreHistoryCtrl($scope, firebaseSvc) {
+                var _this = this;
+                this.firebaseSvc = firebaseSvc;
+                $scope.ChoreHistoryCtrl = this;
+                this.firebaseSvc.getChoreHistory().then(function (d) {
+                    _this.historyList = d;
+                });
+            }
+            ChoreHistoryCtrl.$inject = ['$scope', 'firebaseSvc'];
+            return ChoreHistoryCtrl;
+        })();
+        Controllers.ChoreHistoryCtrl = ChoreHistoryCtrl;
+    })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
+})(Chores || (Chores = {}));
 ///<reference path="../all.d.ts"/>
 var Chores;
 (function (Chores) {
     var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch', 'ngRoute', , 'ngCookies', 'angularModalService'])
         .service('dateSvc', Chores.Services.dateSvc)
         .service('firebaseSvc', Chores.Services.fireBaseSvc)
+        .service('sessionStorageSvc', Chores.Services.sessionStorageSvc)
         .service('sessionSvc', Chores.Services.sessionSvc)
         .controller(Chores.Controllers)
         .directive(Chores.Directives);

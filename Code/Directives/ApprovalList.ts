@@ -29,8 +29,7 @@ module Chores.Controllers {
 		
 		approve(){
 			console.log('approving..')
-			this.firebaseSvc.thisweeksChores.child('Meta').child('Completed').set(true);
-			this.firebaseSvc.thisweeksChores.child('Meta').child('CompletedOn').set(new Date());
+			this.firebaseSvc.approveWeek();
 		}		
 	}
 }

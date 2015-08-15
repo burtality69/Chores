@@ -7,38 +7,36 @@ module Chores.Services {
 		public firebase: Firebase;
 		/**Chore templates endpoint */
 		public choresUrl: Firebase;
-		public dateSvc: dateSvc;
+		/**The weekly chores data endpoint */
 		public weekly: Firebase
-		public $q: ng.IQService;
-		public thisweeksChores: Firebase;
-		public thisweeksMeta: Firebase;
-		public firebaseArray: AngularFireArrayService;
+		/**The weekly metadata endpoint */
+		public meta: Firebase
+		
+		/**The naming convention for a week node */
+		public weekdate: string; 
 
 		static $inject = ['$q', 'dateSvc', '$firebaseArray']
 
-		constructor($q: angular.IQService, dateSvc: Chores.Services.dateSvc, $firebaseArray) {
-			this.dateSvc = dateSvc;
+		constructor(public $q: angular.IQService, public dateSvc: Chores.Services.dateSvc, public AngularFireArray: AngularFireArrayService) {
 			this.firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
 			this.choresUrl = this.firebase.child("Chores");
 			this.weekly = this.firebase.child("Weekly");
-			this.$q = $q;
-			this.firebaseArray = $firebaseArray;
+			this.meta = this.firebase.child("Meta");
+			this.weekdate =  dateSvc.thisWeek;
 		}
 		
 		/**Checks if the current week already exists, if not, it creates it via createWeek */
 		checkWeek(): ng.IPromise<boolean> {
 
-			var weekdate = this.dateSvc.thisWeek;
 			var exists: boolean = false;
 			var p = this.$q.defer();
 			
 			//Short circuit here if value is found
-			this.weekly.child(weekdate).once("value", (data: FirebaseDataSnapshot) => {
+			this.weekly.child(this.weekdate).once("value", (data: FirebaseDataSnapshot) => {
 				if (data.val() !== null) {
-					this.thisweeksChores = this.weekly.child(weekdate);
 					p.resolve();
 				} else {
-					this.createWeek(weekdate).then(() => {
+					this.createWeek(this.weekdate).then(() => {
 						p.resolve(true);
 					}, (error) => {
 						throw new Error(error);
@@ -54,7 +52,7 @@ module Chores.Services {
 			var p = this.$q.defer();
 			
 			this.firebase.child('Meta').once('value',data=>{
-				p.resolve(data);	
+				p.resolve(data.val());	
 			})
 			return p.promise;
 		}
@@ -76,37 +74,40 @@ module Chores.Services {
 			var start = this.dateSvc.weekStart;
 			var end = this.dateSvc.today;
 			this.checkWeek().then(() => {
-				var query = this.thisweeksChores.child('chores').orderByChild('completed').equalTo(false);
-				p.resolve(this.firebaseArray(query));
+				var query = this.firebase.child('Weekly').child(this.weekdate).orderByChild('completed').equalTo(false);
+				p.resolve(this.AngularFireArray(query));
 			})
 
 			return p.promise;
 		}
 		
+		approveWeek(){
+			var now = new Date().getTime();
+			this.firebase.child('Meta').child(this.weekdate).update({Completed: true, CompletedOn: now})
+		}
 		/** Creates a master record for the week on firebase */
 		createWeek(weekdate: string): ng.IPromise<any> {
 			var t: ChoreTemplateList = {};
-			var weeklyChores: WeeklyChorelist = { chores: [], Meta: { Completed: false, CompletedOn: 0, Paid: false } };
+			var weeklyMeta = { Completed: false, CompletedOn: 0, Paid: false };
 			var p = this.$q.defer();
 
 			this.buildChoreList().then(data =>{
-				weeklyChores.chores = data;
-				this.weekly.child(weekdate).set(weeklyChores);
-				this.thisweeksChores = this.weekly.child(weekdate);
+
+				this.meta.child(this.weekdate).set(weeklyMeta);
+				this.weekly.child(weekdate).set(data);
+				
 				p.resolve();
 			});
 			
 			return p.promise;
-		}
-		
-		
+		}		
 		
 		/** Gets progress for this weeks chore (chore master view) */
 		getChoresOverView(): ng.IPromise<ChoreList> {
 			var p = this.$q.defer();
 
 			this.checkWeek().then(() => {
-				this.thisweeksChores.once('value', d=> {
+				this.firebase.child('Weekly').child(this.weekdate).once('value', d=> {
 					p.resolve(d.val());
 				})
 			})
@@ -140,6 +141,7 @@ module Chores.Services {
 						if(p){
 							var b: Chore = {
 								Name: chore.Name,
+								imgSource: chore.Image,
 								Description: chore.Description,
 								Due: dates[i],
 								completed: false,

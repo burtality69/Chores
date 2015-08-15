@@ -11,6 +11,7 @@
 ///<reference path="./interfaces/chorelist.ts"/>
 ///<reference path="./interfaces/IUserProfile.ts"/>
 
+///<reference path="./code/services/sessionStorageSvc.ts"/>
 ///<reference path="./code/services/sessionSvc.ts"/>
 ///<reference path="./code/services/dateSvc.ts"/>
 ///<reference path="./code/services/firebaseSvc.ts"/>
