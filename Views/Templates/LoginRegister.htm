@@ -1,12 +1,15 @@
-<div id="modal1" class="modal" style="display:block;">
+<div id="fade" ng-show="LoginModalCtrl.display"></div>
+<div id="modal1" class="modal"  style="display:block;z-index:100;">
   <div class="modal-content">
     <h4>Login</h4>
-    <input id="email" type="email" placeholder="email@example.com"></input>
+    <input id="email" type="email" placeholder="email@example.com" ng-model="LoginModalCtrl.loginForm.email"></input>
     <label for="email">Email</label>
-    <input type="password" id="password" placeholder="password"></input>
+    <input type="password" id="password" placeholder="password"ng-model="LoginModalCtrl.loginForm.password"></input>
     <label for="password">Password</label>
+    <span ng-show="LoginModalCtrl.error">{{LoginModalCtrl.error}}</span>
   </div>
   <div class="modal-footer">
-    <a href="#!" ng-click="close()" class=" modal-action modal-close waves-effect waves-green btn-flat">Agree</a>
+    <a href="#!" ng-click="LoginModalCtrl.logIn()" class=" modal-action modal-close waves-effect waves-green btn-flat">Log In</a>
   </div>
 </div>
+

@@ -11,6 +11,7 @@ module Chores.Services {
 		public weekly: Firebase
 		public $q: ng.IQService;
 		public thisweeksChores: Firebase;
+		public thisweeksMeta: Firebase;
 		public firebaseArray: AngularFireArrayService;
 
 		static $inject = ['$q', 'dateSvc', '$firebaseArray']
@@ -48,18 +49,23 @@ module Chores.Services {
 			return p.promise;
 		}
 		
-		/** Creates a master record for the week on firebase */
-		createWeek(weekdate: string): ng.IPromise<any> {
-			var t: ChoreTemplateList = {};
-			var weeklyChores: WeeklyChorelist = { chores: [], Meta: { Completed: false, CompletedOn: 0, Paid: false } };
+		/** Returns the meta for each available week of chores */
+		getChoreHistory(): ng.IPromise<ChoresMeta[]>{
 			var p = this.$q.defer();
-
-			this.buildChoreList().then(data =>{
-				weeklyChores.chores = data;
-				this.weekly.child(weekdate).set(weeklyChores);
-				this.thisweeksChores = this.weekly.child(weekdate);
-				p.resolve();
-			});
+			
+			this.firebase.child('Meta').once('value',data=>{
+				p.resolve(data);	
+			})
+			return p.promise;
+		}
+		
+		/** Returns the profile of a user by UID - for execution after authorisatin */
+		getUserProfile(UID:string): ng.IPromise<IUserProfile> {
+			var p = this.$q.defer()
+			
+			this.firebase.child('Users').child(UID).once('value',d=>{
+				p.resolve(d.val());
+			})
 			
 			return p.promise;
 		}
@@ -76,6 +82,24 @@ module Chores.Services {
 
 			return p.promise;
 		}
+		
+		/** Creates a master record for the week on firebase */
+		createWeek(weekdate: string): ng.IPromise<any> {
+			var t: ChoreTemplateList = {};
+			var weeklyChores: WeeklyChorelist = { chores: [], Meta: { Completed: false, CompletedOn: 0, Paid: false } };
+			var p = this.$q.defer();
+
+			this.buildChoreList().then(data =>{
+				weeklyChores.chores = data;
+				this.weekly.child(weekdate).set(weeklyChores);
+				this.thisweeksChores = this.weekly.child(weekdate);
+				p.resolve();
+			});
+			
+			return p.promise;
+		}
+		
+		
 		
 		/** Gets progress for this weeks chore (chore master view) */
 		getChoresOverView(): ng.IPromise<ChoreList> {

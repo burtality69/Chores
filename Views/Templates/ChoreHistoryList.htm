@@ -1,0 +1,20 @@
+<div class="card">
+	<div class="card-content">
+		<ul class="collection">
+			<li class="collection-item" ng-repeat="t in HistoryCtrl.historyList" template="t">
+				<span class="title"> {{::t.Name}} </span>
+				<span> {{::t.Description}} </span>
+				<span class="secondary-content">
+					<input type="checkbox" class="filled-in" id="{{::$index}}0" ng-model="t.Schedule[0]"/>
+					<label for="{{::$index}}0">Monday</label>
+					<input type="checkbox" class="filled-in" id="{{::$index}}1" ng-model="t.Schedule[1]"/>
+					<label for="{{::$index}}1">Tuesday</label>
+					<input type="checkbox" class="filled-in" id="{{::$index}}2" ng-model="t.Schedule[2]"/>
+					<label for="{{::$index}}2">Wednesday</label>
+					<input type="checkbox" class="filled-in" id="{{::$index}}3" ng-model="t.Schedule[3]"/>
+				</span>
+			</li>
+		</ul>
+		<!--<button class="btn waves-effect waves-light" ng-click="CTListCtrl.save()" name="action">Save changes</button>-->
+	</div>
+</div>

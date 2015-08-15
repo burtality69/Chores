@@ -5,34 +5,60 @@
 ///<reference path="../all.d.ts"/>
 ;
 ;
+///<reference path="../all.d.ts"/>
+;
 ///<reference path="../../all.d.ts"/>
 var Chores;
 (function (Chores) {
     var Services;
     (function (Services) {
-        var SessionSvc = (function () {
-            function SessionSvc($cookies, firebaseSvc) {
+        var sessionSvc = (function () {
+            function sessionSvc($cookies, firebaseSvc, $q) {
+                this.$cookies = $cookies;
+                this.fireBaseSvc = firebaseSvc;
+                this.$q = $q;
             }
-            SessionSvc.prototype.logIn = function (credentials) {
+            sessionSvc.prototype.logIn = function (credentials) {
                 var _this = this;
+                var p = this.$q.defer();
                 this.fireBaseSvc.firebase.authWithPassword(credentials, function (e, a) {
-                    _this.$cookies.put('Authtoken', a.token);
+                    if (e) {
+                        p.reject(e);
+                    }
+                    else {
+                        _this.$cookies.put('Authtoken', a.token);
+                        _this.fireBaseSvc.getUserProfile(a.uid).then(function (profile) {
+                            _this._profile = profile;
+                            p.resolve(a);
+                        });
+                    }
                 });
+                return p.promise;
             };
-            SessionSvc.prototype.logOut = function () {
+            sessionSvc.prototype.logOut = function () {
                 this.$cookies.remove('Authtoken');
             };
-            Object.defineProperty(SessionSvc.prototype, "userLoggedIn", {
+            Object.defineProperty(sessionSvc.prototype, "Profile", {
                 get: function () {
-                    return this.$cookies.get('Authtoken').length;
+                    return this._profile;
+                },
+                set: function (p) {
+                    this._profile = p;
                 },
                 enumerable: true,
                 configurable: true
             });
-            SessionSvc.$inject = ['$cookies'];
-            return SessionSvc;
+            Object.defineProperty(sessionSvc.prototype, "userLoggedIn", {
+                get: function () {
+                    return this.$cookies.get('Authtoken') != undefined;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            sessionSvc.$inject = ['$cookies', 'firebaseSvc', '$q'];
+            return sessionSvc;
         })();
-        Services.SessionSvc = SessionSvc;
+        Services.sessionSvc = sessionSvc;
     })(Services = Chores.Services || (Chores.Services = {}));
 })(Chores || (Chores = {}));
 ///<reference path="../../all.d.ts"/>
@@ -146,6 +172,13 @@ var Chores;
                 });
                 return p.promise;
             };
+            fireBaseSvc.prototype.getUserProfile = function (UID) {
+                var p = this.$q.defer();
+                this.firebase.child('Users').child(UID).once('value', function (d) {
+                    p.resolve(d.val());
+                });
+                return p.promise;
+            };
             /** Creates a master record for the week on firebase */
             fireBaseSvc.prototype.createWeek = function (weekdate) {
                 var _this = this;
@@ -226,30 +259,15 @@ var Chores;
 ///<reference path="../../all.d.ts"/>
 var Chores;
 (function (Chores) {
-    var Directives;
-    (function (Directives) {
-        function loginPanel() {
-            return {
-                restrict: 'E',
-                controller: Chores.Controllers.loginPanelCtrl,
-                controllerAs: 'loginPanelCtrl',
-                replace: true,
-                templateUrl: './Views/Templates/LoginPanel.htm'
-            };
-        }
-        Directives.loginPanel = loginPanel;
-    })(Directives = Chores.Directives || (Chores.Directives = {}));
-})(Chores || (Chores = {}));
-var Chores;
-(function (Chores) {
     var Controllers;
     (function (Controllers) {
-        var loginPanelCtrl = (function () {
-            function loginPanelCtrl(sessionSvc, ModalService) {
-                this.sessionSvc = sessionSvc;
+        var AppController = (function () {
+            function AppController(ModalService, sessionSvc, $rootScope) {
                 this.ModalService = ModalService;
+                this.sessionSvc = sessionSvc;
+                this.$rootScope = $rootScope;
             }
-            loginPanelCtrl.prototype.login = function () {
+            AppController.prototype.logIn = function () {
                 this.ModalService.showModal({
                     controller: 'LoginModalCtrl',
                     templateUrl: './Views/Templates/LoginRegister.htm'
@@ -259,24 +277,59 @@ var Chores;
                     });
                 });
             };
-            loginPanelCtrl.prototype.logOut = function () {
+            AppController.prototype.logOut = function () {
+                this.sessionSvc.logOut();
             };
-            loginPanelCtrl.$inject = ['sessionSvc', 'ModalService'];
-            return loginPanelCtrl;
+            Object.defineProperty(AppController.prototype, "loggedIn", {
+                get: function () {
+                    return this.sessionSvc.userLoggedIn;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(AppController.prototype, "user", {
+                get: function () {
+                    return this.sessionSvc.Profile;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AppController.$inject = ['ModalService', 'sessionSvc', '$rootScope'];
+            return AppController;
         })();
-        Controllers.loginPanelCtrl = loginPanelCtrl;
+        Controllers.AppController = AppController;
     })(Controllers = Chores.Controllers || (Chores.Controllers = {}));
 })(Chores || (Chores = {}));
+///<reference path="../../all.d.ts"/>"
+;
 var Chores;
 (function (Chores) {
     var Controllers;
     (function (Controllers) {
         var LoginModalCtrl = (function () {
-            function LoginModalCtrl($scope, close) {
-                this.close = close;
+            function LoginModalCtrl($scope, close, sessionSvc) {
+                var _this = this;
+                this.sessionSvc = sessionSvc;
+                $scope.LoginModalCtrl = this;
+                this.display = true;
                 this.loginForm = { email: '', password: '' };
+                this.close = function () {
+                    _this.display = false;
+                    close();
+                };
             }
-            LoginModalCtrl.$inject = ['$scope', 'close'];
+            LoginModalCtrl.prototype.logIn = function () {
+                var _this = this;
+                this.sessionSvc.logIn(this.loginForm).then(function (a) {
+                    _this.close();
+                }).catch(function (e) {
+                    _this.error = e.message;
+                });
+            };
+            LoginModalCtrl.prototype.cancel = function () {
+                this.close();
+            };
+            LoginModalCtrl.$inject = ['$scope', 'close', 'sessionSvc'];
             return LoginModalCtrl;
         })();
         Controllers.LoginModalCtrl = LoginModalCtrl;
@@ -460,7 +513,7 @@ var Chores;
     var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch', 'ngRoute', , 'ngCookies', 'angularModalService'])
         .service('dateSvc', Chores.Services.dateSvc)
         .service('firebaseSvc', Chores.Services.fireBaseSvc)
-        .service('sessionSvc', Chores.Services.SessionSvc)
+        .service('sessionSvc', Chores.Services.sessionSvc)
         .controller(Chores.Controllers)
         .directive(Chores.Directives);
     app.config(['$routeProvider', '$locationProvider', function ($routeProvider, $locationProvider) {
