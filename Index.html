@@ -22,7 +22,7 @@
 			</span>
 		</div>
 	</nav>
-	<section ng-view id="main"></section>
+	<section ng-view id="main" ng-if="AppCtrl.loggedIn"></section>
 	<link rel="stylesheet" type="text/css" href="./Styles/Site.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
 	<script src="./Dependencies/firebase.js"></script>

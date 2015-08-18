@@ -276,7 +276,7 @@ var Chores;
                             if (p) {
                                 var b = {
                                     Name: chore.Name,
-                                    imgSource: chore.Image,
+                                    Image: chore.Image || '',
                                     Description: chore.Description,
                                     Due: dates[i],
                                     completed: false,

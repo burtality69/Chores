@@ -141,7 +141,7 @@ module Chores.Services {
 						if(p){
 							var b: Chore = {
 								Name: chore.Name,
-								imgSource: chore.Image,
+								Image: chore.Image || '',
 								Description: chore.Description,
 								Due: dates[i],
 								completed: false,
