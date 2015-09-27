@@ -4,35 +4,35 @@ module Chores.Directives {
 	export function choreList(): ng.IDirective {
 		return {
 			restrict: 'EA',
-			templateUrl: './Views/Templates/ChoreList.htm',
 			bindToController: true,
-			controller: Chores.Controllers.chorelistController,
+			controller: chorelistController,
 			controllerAs: 'ChoreListCtrl',
-			replace: true
+			replace: true,
+			template: `<div>
+							<h1 class="header center orange-text"> Chores </h1>
+							<div class="container" id="choreList">
+								<chore-card ng-animate="'animate'" ng-repeat="chore in ChoreListCtrl.chorelist | filter: chore.Due < ChoreListCtrl.filterDate && !chore.completed"
+								chore="chore"></chore-card>
+							</div>
+					  </div>`
 		}
 	}
-}
+	class chorelistController {
 
-module Chores.Controllers {
-	export class chorelistController {
-		
-		static $inject = ['firebaseSvc','dateSvc'];
-		
+		static $inject = ['choresDataSvc', 'dateSvc'];
+
 		public chorelist: AngularFireArray;
-		public firebaseSvc: Chores.Services.fireBaseSvc;
-		public firebaseArray: AngularFireArrayService;
 		public filterDate: number;
-		
-		constructor(fireBaseSvc: Chores.Services.fireBaseSvc, dateSvc: Chores.Services.dateSvc) {
-			
-			this.firebaseSvc = fireBaseSvc;
-			this.firebaseSvc.getChoreToDoList().then((p)=>{
-					p.$loaded().then(d=>{
-						this.chorelist = d;
-					})
+
+		constructor(public dataSvc: Services.choresDataSvc, dateSvc: Services.dateSvc) {
+
+			this.dataSvc.getChoreToDoList().then((p) => {
+				p.$loaded().then(d=> {
+					this.chorelist = d;
+				})
 			})
 			this.filterDate = dateSvc.today;
 		}
-		
+
 	}
 }

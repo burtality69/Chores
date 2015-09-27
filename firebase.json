@@ -10,7 +10,8 @@
     "**/Interfaces/**",
     "**/*.ts",
     "**/node_modules/**",
-    "**/.settings/**"
+    "**/.settings/**",
+    "*/images/**"
   ],
   "rewrites": [ {
   "source": "**",

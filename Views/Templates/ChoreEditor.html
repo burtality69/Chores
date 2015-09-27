@@ -1,5 +1,28 @@
-<div class="card">
-	<div class="card-content">
-	Placeholder
+<div class="card-content">
+	<div ng-show="choreEditCtrl.expanded">
+		<label for="choreName"> Name </label>
+		<input type="text" ng-model="choreEditCtrl.chore.Name" name="choreName" placeholder="Enter chore Name">
+		<label for ="description"> Description </label>
+		<input type="text" ng-model="choreEditCtrl.chore.Description" name ="description" placeholder="Enter description">
+		<label for ="image"> Image </label>
+		<input type="file" file-upload ng-model="choreEditCtrl.chore.Image" name="image">
+		<div class="secondary-content">
+			<input type="checkbox" class="filled-in" id="0" ng-model="choreEditCtrl.chore.Schedule[0]"/>
+			<label for="0">Monday</label>
+			<input type="checkbox" class="filled-in" id="1" ng-model="choreEditCtrl.chore.Schedule[1]"/>
+			<label for="1">Tuesday</label>
+			<input type="checkbox" class="filled-in" id="2" ng-model="choreEditCtrl.chore.Schedule[2]"/>
+			<label for="2">Wednesday</label>
+			<input type="checkbox" class="filled-in" id="3" ng-model="choreEditCtrl.chore.Schedule[3]"/>
+			<label for="3">Thursday</label>
+			<input type="checkbox" class="filled-in" id="4" ng-model="choreEditCtrl.chore.Schedule[4]"/>
+			<label for="4">Friday</label>
+			<input type="checkbox" class="filled-in" id="5" ng-model="choreEditCtrl.chore.Schedule[5]"/>
+			<label for="5">Saturday</label>
+			<input type="checkbox" class="filled-in" id="6" ng-model="choreEditCtrl.chore.Schedule[6]"/>
+			<label for="6">Sunday</label>
+		</div>
+		<button class="btn waves-effect waves-light" ng-click="choreEditCtrl.save()">
 	</div>
+	<button ng-show="!choreEditCtrl.expanded" class="btn waves-effect waves-light" ng-click="choreEditCtrl.toggleEditor()">Add Chore</button>
 </div>

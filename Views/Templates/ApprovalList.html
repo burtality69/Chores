@@ -1,8 +1,8 @@
 <div>
 	<ul class="collection">
 		<li class="collection-item" ng-repeat="chore in ApprovalCtrl.chorelist" chore="chore">
-				<span>{{chore.Name}}</span>
-				<span>{{chore.Due}}</span>
+				<h5>{{chore.Name}}</h5>
+				<span>Due: {{chore.Due | date:'EEE MM-dd-yy'}}</span>
 				<span class="secondary-content">
 					<input type="checkbox" class="filled-in" id="{{$index}}" ng-checked="{{chore.completed}}"/>
 					<label for="{{$index}}"></label>

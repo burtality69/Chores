@@ -2,10 +2,12 @@
 
 module Chores {
 
-  var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch','ngRoute',,'ngCookies','angularModalService'])
+  var app = angular.module('Chores', ['firebase', 'ngAnimate', 'ngTouch','ngRoute',,'ngCookies','angularModalService','ui.bootstrap'])
     .service('dateSvc', Chores.Services.dateSvc)
-    .service('firebaseSvc', Chores.Services.fireBaseSvc)
     .service('sessionStorageSvc',Chores.Services.sessionStorageSvc)
+    .service('firebaseSvc', Chores.Services.firebaseSvc)
+    .service('choresDataSvc', Chores.Services.choresDataSvc)
+    .service('userProfileSvc',Chores.Services.userProfileSvc)
     .service('sessionSvc',Chores.Services.sessionSvc)
     .controller(Chores.Controllers)
     .directive(Chores.Directives);

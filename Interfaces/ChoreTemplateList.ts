@@ -1,2 +1,2 @@
 ///<reference path="../all.d.ts"/>
-interface ChoreTemplateList {[id: number]: ChoreTemplate};
+interface ChoreTemplateList {[id: number]: IChoreTemplate};

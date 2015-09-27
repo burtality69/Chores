@@ -5,31 +5,26 @@ module Chores.Directives {
 		return {
 			restrict: 'EA',
 			templateUrl: './Views/Templates/ApprovalList.html',
-			controller: Chores.Controllers.ApprovalListController,
+			controller: ApprovalListController,
 			controllerAs: 'ApprovalCtrl',
 			bindToController: true,
 			replace: true
 		}
 	}
-}
 
-module Chores.Controllers {
-	export class ApprovalListController {
+	class ApprovalListController {
 		public chorelist: ChoreList
-		static $inject = ['firebaseSvc','$firebaseArray'];
-		public firebaseArray: AngularFireArrayService;
-		public firebaseSvc: Chores.Services.fireBaseSvc;
-		
-		constructor(firebaseSvc: Chores.Services.fireBaseSvc){
-			this.firebaseSvc = firebaseSvc;
-			this.firebaseSvc.getChoresOverView().then((p)=>{
+		static $inject = ['choresDataSvc'];
+
+		constructor(public dataSvc: Services.choresDataSvc) {
+			this.dataSvc.getChoresOverView().then((p) => {
 				this.chorelist = p;
 			})
 		}
-		
-		approve(){
+
+		approve() {
 			console.log('approving..')
-			this.firebaseSvc.approveWeek();
-		}		
+			this.dataSvc.approveWeek();
+		}
 	}
 }

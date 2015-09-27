@@ -1,31 +1,32 @@
 ///<reference path="../../all.d.ts"/>
 
 module Chores.Directives {
+	
+	interface IChoreHistoryScope extends ng.IScope {
+		ChoreHistoryCtrl: ChoreHistoryCtrl
+	}
+	
 	export function choreHistoryList(): ng.IDirective {
 		return {
 			restrict: 'E',
-			controller: Chores.Controllers.ChoreHistoryCtrl,
-			controlleras: 'HistoryCtrl',
+			controller: ChoreHistoryCtrl,
+			controllerAs: 'HistoryCtrl',
 			bindToController: true,
 			replace: true,
 			templateUrl: '/Views/Templates/ChoreHistoryList.htm'
 		}
 	}
-}
 
-interface IChoreHistoryScope extends ng.IScope {ChoreHistoryCtrl: Chores.Controllers.ChoreHistoryCtrl}
-
-module Chores.Controllers {
-	export class ChoreHistoryCtrl {
+	class ChoreHistoryCtrl {
 		
-		static $inject = ['$scope','firebaseSvc'];
+		static $inject = ['$scope','choresDataSvc'];
 		public historyList: ChoresMeta[];
 		
 		
-		constructor($scope: IChoreHistoryScope, public firebaseSvc: Chores.Services.fireBaseSvc) {
+		constructor($scope: IChoreHistoryScope, public dataSvc: Services.choresDataSvc) {
 			$scope.ChoreHistoryCtrl = this; 
 			
-			this.firebaseSvc.getChoreHistory().then(d=>{
+			this.dataSvc.getChoreHistory().then(d=>{
 				this.historyList = d;
 			})
 		}		

@@ -36,3 +36,11 @@
     top: -50px;
     height: 0px;
 }
+
+user-menu li{
+    display:block;
+}   
+
+user-menu i {
+    cursor: pointer;
+}

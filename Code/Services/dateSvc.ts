@@ -4,19 +4,15 @@ module Chores.Services {
 	
 	/** Contains date utilities commonly used across the app */
 	export class dateSvc {
-		_thisweek: string;
-		_weekstart: number
-		_today: number; 
+		private _thisweek: string;
+		private _weekstart: number;
+		private _today: number; 
 		private weekstartDate;
 		
 		constructor(){
 			var d = new Date();
-   			//var yyyy = d.getFullYear().toString();
-   			//var mm = (d.getMonth()+1).toString(); // getMonth() is zero-based
-			//var day = d.getDay();
       		var diff = d.getDate() - d.getDay() + (d.getDay() == 0 ? -6:1); // adjust when day is sunday
   			d.setDate(diff);
-   			//var dd = d.getDate().toString();
 			this.weekstartDate = d; 
 			this._weekstart = d.getTime();
 			   
@@ -54,6 +50,10 @@ module Chores.Services {
 		/**Returns the start of the week in timestamp form */
 		get weekStart():number{
 			return this._weekstart;
+		}
+		
+		get weekStartString():string {
+			return this._weekstart.toString();
 		}
 		
 		/**Converts a data to a string in MMDDYYYY */

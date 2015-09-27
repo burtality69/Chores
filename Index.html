@@ -7,24 +7,33 @@
 
 <body ng-controller='AppController as AppCtrl'>
 	<nav>
-		<div class="nav-wrapper">
-			<a href="/" class="brand-logo">Chores</a>
-			<span>
-				<ul ng-show="AppCtrl.loggedIn && AppCtrl.user.Role=='Parent'" id="nav-mobile" class="right hide-on-med-and-down">
-					<li><a href="Approve">Approve</a></li>
-					<li><a href="History">History</a></li>
-					<li><a href="Settings">{{AppCtrl.user.Firstname}}</a></li>
-				</ul>
-				<span class="right">
+		<div ng-cloak class="nav-wrapper">
+			<div class="col s12">
+				<a href="/" class="brand-logo">Chores</a>
+				<div class="right">
+					<ul ng-show="AppCtrl.loggedIn && AppCtrl.user.Role=='Parent'" id="nav-mobile">
+						<li><a href="Approve">Approve</a></li>
+						<li><a href="History">History</a></li>
+						<li drop-down ng-click="dropDownCtrl.toggle()"><i class="material-icons" ng-click="userMenuCtrl.toggle()">settings</i>
+							<ul role="menu" class="dropdown-list" ng-show="dropDownCtrl.expanded" aria-labelledby="single-button">
+								<li role="menuitem"><a href="#">Chore Lists</a></li>
+								<li role="menuitem"><a href="#">Profile</a></li>
+								<li class="divider"></li>
+								<li role="menuitem"><a href="#" ng-click="logOut()">Log Out</a></li>
+							</ul>
+						</li>
+						
+					</ul>
 					<button class="btn waves-effect waves-light" ng-if="!AppCtrl.loggedIn" ng-click="AppCtrl.logIn()" name="action">Log In</button>
 					<button class="btn waves-effect waves-light" ng-if="AppCtrl.loggedIn" ng-click="AppCtrl.logOut()" name="action">Log Out</button>
-				</span>
-			</span>
+				</div>
+			</div>
 		</div>
 	</nav>
 	<section ng-view id="main" ng-if="AppCtrl.loggedIn"></section>
 	<link rel="stylesheet" type="text/css" href="./Styles/Site.css">
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.0/css/materialize.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 	<script src="./Dependencies/firebase.js"></script>
 	<script src="./Dependencies/angular.min.js"></script>
 	<script src="./Dependencies/angular-animate.min.js"></script>
@@ -33,6 +42,7 @@
 	<script src="./Dependencies/angular-route.min.js"></script>
 	<script src="./Dependencies/angular-cookies.min.js"></script>
 	<script src="./Dependencies/angular-modal-service.min.js"></script>
+	<script src="./Dependencies/ui-bootstrap-custom-tpls-0.13.4.min.js"></script>
 	<script src="./Release/App.js"></script>
 </body>
 

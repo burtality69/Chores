@@ -1,40 +1,37 @@
 ///<reference path="../../all.d.ts"/>
 
-module Chores.Directives{
-	export function choreTemplateList() : ng.IDirective {
+module Chores.Directives {
+	export function choreTemplateList(): ng.IDirective {
 		return {
 			restrict: 'E',
-			controller: Chores.Controllers.ChoreTemplateListCtrl,
+			controller: ChoreTemplateListCtrl,
 			controllerAs: 'CTListCtrl',
 			templateUrl: './Views/Templates/ChoreTemplateList.html',
-			bindToController: true			
+			bindToController: true
 		}
 	}
-}
+	
+	class ChoreTemplateListCtrl {
 
-module Chores.Controllers {
-	export class ChoreTemplateListCtrl{
+		static $inject = ['choresDataSvc'];
 		public choretemplates: ChoreTemplateList;
-		public firebaseSvc: Chores.Services.fireBaseSvc;
-		
-		constructor(firebaseSvc: Chores.Services.fireBaseSvc){
-			this.firebaseSvc = firebaseSvc;	
+
+		constructor(public dataSvc: Services.choresDataSvc) {
 			this.load()
 		}
-		
-		save(){
-			this.firebaseSvc.choresUrl.set(this.choretemplates,(e)=>{
-				if(e){
-					console.log('There was a problem saving');
-				} else {
-					console.log('saved successfully');
+
+		save() {
+			this.dataSvc.setChoreTemplates(this.choretemplates)
+				.then(() => {
 					this.load();
-				}
-			});
+				})
+				.catch((e) => {
+					console.log('There was an error saving the list');
+				})
 		}
-		
-		load(){
-			this.firebaseSvc.getChoreTemplates().then(data=>{
+
+		load() {
+			this.dataSvc.getChoreTemplates().then(data=> {
 				this.choretemplates = data;
 			})
 		}

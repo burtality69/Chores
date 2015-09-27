@@ -1,12 +1,14 @@
 ///<reference path="../all.d.ts"/>
-interface Chore extends ChoreTemplate {
+interface Chore extends IChoreTemplate {
 	completed: boolean,
 	approved: boolean,
 	Due: number
+	Image: string
 }
 
 interface $SyncChore extends AngularFireSimpleObject {
 	completed: boolean,
 	approved: boolean,
-	Due: number
+	Due: number,
+	Image: string
 }

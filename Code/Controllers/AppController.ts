@@ -3,9 +3,13 @@
 module Chores.Controllers {
 	
 	export class AppController {
-		static $inject = ['ModalService','sessionSvc','$rootScope'];
 		
-		constructor(public ModalService: angular.modalService.modalService, public sessionSvc: Chores.Services.sessionSvc, public $rootScope: ng.IRootScopeService) {
+		static $inject = ['ModalService','sessionSvc','$rootScope','userProfileSvc'];
+		
+		constructor(public ModalService: angular.modalService.modalService, 
+					public sessionSvc: Chores.Services.sessionSvc, 
+					public $rootScope: ng.IRootScopeService,
+					public userProfileSvc: Chores.Services.userProfileSvc) {
 		}
 		
 		logIn(){
@@ -28,7 +32,7 @@ module Chores.Controllers {
 		}
 		
 		get user(){
-			return this.sessionSvc.Profile;
+			return this.userProfileSvc.userProfile;
 		}
 		
 	}

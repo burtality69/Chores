@@ -1,4 +1,4 @@
-interface ChoreTemplate {
+interface IChoreTemplate {
 	Name: string,
 	Image?: string,
 	Description: string,

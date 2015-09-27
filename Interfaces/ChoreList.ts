@@ -1,5 +1,5 @@
 ///<reference path="../all.d.ts"/>
-interface ChoreList {[id: string]: ChoreTemplate};
+interface ChoreList {[id: string]: IChoreTemplate};
 interface WeeklyChorelist {chores: Chore[], Meta: ChoresMeta};
 interface ChoresMeta {Completed: boolean, CompletedOn: Date|number, Paid: boolean}
 
