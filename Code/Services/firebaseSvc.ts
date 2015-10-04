@@ -9,10 +9,9 @@ module Chores.Services {
 		private _meta: Firebase;
 		private _users: Firebase;
 
-		static $inject = ['$q', 'dateSvc', '$firebaseArray'];
+		static $inject = ['$q', '$firebaseArray'];
 
 		constructor(public $q: angular.IQService,
-			public dateSvc: Chores.Services.dateSvc,
 			public AngularFireArray: AngularFireArrayService) {
 
 			this._firebase = new Firebase("https://shining-torch-394.firebaseio.com/");

@@ -4,5 +4,7 @@ interface IUserProfile {
 	Firstname: string, 
 	LastName: string, 
 	Role: string, 
-	UID:string
+	UID:string, 
+	Children?: string,
+	Weekstart?: number
 };

@@ -37,10 +37,24 @@
     height: 0px;
 }
 
-user-menu li{
+[drop-down] {
+    list-style: none;
+
+}
+
+[drop-down] li{
     display:block;
+    width: 150px;
 }   
 
-user-menu i {
+[drop-down] i {
     cursor: pointer;
+}
+
+.dropdown-show {
+    display: block;
+}
+
+.dropdown-hide{
+    display: none;
 }

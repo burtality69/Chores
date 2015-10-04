@@ -80,9 +80,16 @@ var Chores;
     (function (Services) {
         /** Contains date utilities commonly used across the app */
         var dateSvc = (function () {
-            function dateSvc() {
+            function dateSvc(userProfileSvc) {
+                var startday = userProfileSvc.userProfile.Weekstart;
                 var d = new Date();
-                var diff = d.getDate() - d.getDay() + (d.getDay() == 0 ? -6 : 1); // adjust when day is sunday
+                //Determine what day the week starts on 
+                if (startday == 7) {
+                    var diff = d.getDate() - d.getDay();
+                }
+                else {
+                    diff = d.getDate() - d.getDay() + (d.getDay() == 0 ? -6 : 1); // adjust when day is sunday
+                }
                 d.setDate(diff);
                 this.weekstartDate = d;
                 this._weekstart = d.getTime();
@@ -146,6 +153,7 @@ var Chores;
                 var dd = d.getDate().toString();
                 return yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]);
             };
+            dateSvc.$inject = ['userProfileSvc'];
             return dateSvc;
         })();
         Services.dateSvc = dateSvc;
@@ -157,9 +165,8 @@ var Chores;
     var Services;
     (function (Services) {
         var firebaseSvc = (function () {
-            function firebaseSvc($q, dateSvc, AngularFireArray) {
+            function firebaseSvc($q, AngularFireArray) {
                 this.$q = $q;
-                this.dateSvc = dateSvc;
                 this.AngularFireArray = AngularFireArray;
                 this._firebase = new Firebase("https://shining-torch-394.firebaseio.com/");
                 this._choresUrl = this._firebase.child("Chores");
@@ -192,7 +199,7 @@ var Chores;
                 enumerable: true,
                 configurable: true
             });
-            firebaseSvc.$inject = ['$q', 'dateSvc', '$firebaseArray'];
+            firebaseSvc.$inject = ['$q', '$firebaseArray'];
             return firebaseSvc;
         })();
         Services.firebaseSvc = firebaseSvc;
@@ -568,6 +575,7 @@ var Chores;
             chorelistController.$inject = ['choresDataSvc', 'dateSvc'];
             return chorelistController;
         })();
+        Directives.chorelistController = chorelistController;
     })(Directives = Chores.Directives || (Chores.Directives = {}));
 })(Chores || (Chores = {}));
 ///<reference path="../../all.d.ts"/>
@@ -728,71 +736,40 @@ var Chores;
         })();
     })(Directives = Chores.Directives || (Chores.Directives = {}));
 })(Chores || (Chores = {}));
-///<reference path="../../all.d.ts"/>
+/// <reference path="../../all.d.ts" />
 var Chores;
 (function (Chores) {
     var Directives;
     (function (Directives) {
-        function userMenu() {
-            return {
-                restrict: 'E',
-                templateUrl: 'Views/Templates/userMenu.html',
-                controller: userMenuCtrl,
-                bindToController: true,
-                controllerAs: 'userMenuCtrl',
-                link: function (scope, el, attrs) {
-                }
-            };
-        }
-        Directives.userMenu = userMenu;
-        var userMenuCtrl = (function () {
-            function userMenuCtrl() {
-            }
-            userMenuCtrl.prototype.toggle = function () {
-                this.isopen = !this.isopen;
-            };
-            return userMenuCtrl;
-        })();
-    })(Directives = Chores.Directives || (Chores.Directives = {}));
-})(Chores || (Chores = {}));
-/// <reference path="../../all.d.ts" />
-var Chores;
-(function (Chores) {
-    var directives;
-    (function (directives) {
         function dropDown() {
             return {
                 restrict: 'EA',
                 controller: dropDownCtrl,
                 controllerAs: 'dropDownCtrl',
                 bindToController: true,
+                scope: {},
                 link: function (scope, el, attrs) {
                     var menu = angular.element(el[0].getElementsByClassName('dropdown-list').item(0));
-                    function toggle(ev) {
-                        if (!scope.dropDownCtrl.expanded) {
-                            menu.addClass('drop-down-show');
-                        }
-                        else {
-                            menu.removeClass('drop-down-show');
-                        }
-                    }
-                    scope.$watch('dropDownCtrl.expanded', toggle);
+                    el.on('click', function (ev) {
+                        console.log('TRIGGERED');
+                        console.log('Scope state is ' + scope.dropDownCtrl.expanded);
+                        scope.dropDownCtrl.expanded = !scope.dropDownCtrl.expanded;
+                        menu.toggleClass('dropdown-show');
+                        menu.toggleClass('dropdown-hide');
+                    });
                 }
             };
         }
-        directives.dropDown = dropDown;
+        Directives.dropDown = dropDown;
         var dropDownCtrl = (function () {
             function dropDownCtrl($scope) {
                 $scope.dropDownCtrl = this;
                 this.expanded = false;
             }
-            dropDownCtrl.prototype.toggle = function () {
-                console.log('expanded');
-                this.expanded = !this.expanded;
-            };
+            dropDownCtrl.$inject = ['$scope'];
             return dropDownCtrl;
         })();
-    })(directives = Chores.directives || (Chores.directives = {}));
+    })(Directives = Chores.Directives || (Chores.Directives = {}));
 })(Chores || (Chores = {}));
 ///<reference path="../all.d.ts"/>
 var Chores;
@@ -801,8 +778,8 @@ var Chores;
         .service('dateSvc', Chores.Services.dateSvc)
         .service('sessionStorageSvc', Chores.Services.sessionStorageSvc)
         .service('firebaseSvc', Chores.Services.firebaseSvc)
-        .service('choresDataSvc', Chores.Services.choresDataSvc)
         .service('userProfileSvc', Chores.Services.userProfileSvc)
+        .service('choresDataSvc', Chores.Services.choresDataSvc)
         .service('sessionSvc', Chores.Services.sessionSvc)
         .controller(Chores.Controllers)
         .directive(Chores.Directives);

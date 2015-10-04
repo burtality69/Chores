@@ -17,7 +17,7 @@ module Chores.Directives {
 			bindToController: true,
 			scope: false,
 			replace: true,
-			link: (scope: IChoreControllerScope, el: Element, attr: ng.IAugmentedJQuery, ctrl: Chores.Controllers.chorelistController) => {
+			link: (scope: IChoreControllerScope, el: Element, attr: ng.IAugmentedJQuery, ctrl: Chores.Directives.chorelistController) => {
 				scope.ChoreCtrl.complete = () => {
 
 					scope.ChoreCtrl.chore.completed = true;

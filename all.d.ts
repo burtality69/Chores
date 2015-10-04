@@ -29,8 +29,6 @@
 ///<reference path="./code/directives/chorehistorylist.ts"/>
 ///<reference path="./code/directives/choreEditor.ts"/>
 ///<reference path="./code/directives/fileUpload.ts" />
-///<reference path="./code/directives/userMenu.ts" />
 ///<reference path="./code/directives/dropdown.ts" />
 
-///referece path="./code/animations/drag.ts"/>
 ///<reference path="./code/app.ts"/>

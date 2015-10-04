@@ -6,8 +6,8 @@ module Chores {
     .service('dateSvc', Chores.Services.dateSvc)
     .service('sessionStorageSvc',Chores.Services.sessionStorageSvc)
     .service('firebaseSvc', Chores.Services.firebaseSvc)
-    .service('choresDataSvc', Chores.Services.choresDataSvc)
     .service('userProfileSvc',Chores.Services.userProfileSvc)
+    .service('choresDataSvc', Chores.Services.choresDataSvc)
     .service('sessionSvc',Chores.Services.sessionSvc)
     .controller(Chores.Controllers)
     .directive(Chores.Directives);

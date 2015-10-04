@@ -17,7 +17,7 @@ module Chores.Directives {
 					  </div>`
 		}
 	}
-	class chorelistController {
+	export class chorelistController {
 
 		static $inject = ['choresDataSvc', 'dateSvc'];
 
